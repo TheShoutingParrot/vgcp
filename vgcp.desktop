@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=vgcp
+GenericName=chess
+Comment=A simple and plain graphical chess program
+Keywords=chess;game;classic;
+Exec=vgcp
+Terminal=false
+Icon=/usr/local/share/vgcp/assets/pieces/king_white.png

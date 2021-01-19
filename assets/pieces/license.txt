@@ -1,0 +1,24 @@
+All of the following image:
+	-king_black.png		- from https://en.wikipedia.org/wiki/File:Chess_kdt45.svg 
+	-king_white.png		- from https://en.wikipedia.org/wiki/File:Chess_klt45.svg
+	-queen_black.png	- from https://en.wikipedia.org/wiki/File:Chess_qdt45.svg
+	-queen_white.png	- from https://en.wikipedia.org/wiki/File:Chess_qlt45.svg
+	-rook_black.png		- from https://en.wikipedia.org/wiki/File:Chess_rdt45.svg
+	-rook_white.png		- from https://en.wikipedia.org/wiki/File:Chess_rlt45.svg
+	-bishop_black.png	- from https://en.wikipedia.org/wiki/File:Chess_bdt45.svg
+	-bishop_white.png	- from https://en.wikipedia.org/wiki/File:Chess_blt45.svg
+	-knight_black.png	- from https://en.wikipedia.org/wiki/File:Chess_ndt45.svg
+	-knight_white.png	- from https://en.wikipedia.org/wiki/File:Chess_nlt45.svg
+	-pawn_black.png		- from https://en.wikipedia.org/wiki/File:Chess_pdt45.svg
+	-pawn_white.png		- from https://en.wikipedia.org/wiki/File:Chess_plt45.svg
+were made by Wikipedia (wikipedia.org) user Cburnett (https://en.wikipedia.org/wiki/User:Cburnett). The images are licensed under the following license:
+
+Copyright © Colin M.L. Burnett
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    Neither the name of The author nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+This software is provided by The author and contributors "as is" and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall The author and contributors be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
