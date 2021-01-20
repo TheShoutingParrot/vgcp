@@ -1,5 +1,31 @@
 Victor's Graphical Chess Program
 
-vgcp is a simple graphical chess program which uses SDL2 and is written in C.
+vgcp is a simple graphical chess UI which uses SDL2 and is written in C.
+
+Usage
+
+Without Installation
+
+To compile this program, run "make" on the "vgcp/" directory. To run the program simply run "./vgcp".
+
+Installation
+
+To install this program, first edit the "include/config.h" file and uncomment the _INSTALL definition ("#define _INSTALL"). After doing this, simply run "sudo make install" which will install the program to "PREFIX/bin" (PREFIX is defined in the makefile) and the assets to PREFIX/share/vgcp/. Now you can use this program on any directory by typing "vgcp" on the command line or by finding it on your application menu.
+
+Features
+
+Here's a list of currently supported features:
+	- All chess pieces moving correctly
+		- Castling
+	- Checkmate and victory
+	- Player vs player gameplay
+
+Here's a list of features that will (hopefully) be implemented in the near future:
+	- En Passant
+	- Draw
+	- Support for some chess protocol
+		- Player vs computer gameplay
+
+Credits
 
 The chess pieces were made by the Wikipedia user Cburnett (https://en.wikipedia.org/wiki/User:Cburnett), see assets/pieces/license.txt for details. The font that the game uses (https://fontstruct.com/fontstructions/show/55273) was made by Axel Leyer, see assets/font/license.txt and assets/font/readme.txt for details.
