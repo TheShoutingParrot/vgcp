@@ -15,17 +15,28 @@ To install this program, first edit the [``` include/config.h ```](include/confi
 ## Features 
 
 Here's a list of currently supported features:
-- All chess pieces moving correctly
+
+  - All chess pieces moving correctly
+
     - Castling
-- Player vs player gameplay
-	- Checkmate and victory
-- Draw (as a result of a stalemate)
+
+  - Player vs player gameplay
+
+    - Checkmate and victory
+
+  - Draw (as a result of a stalemate)
+
 
 Here's a list of features that will (hopefully) be implemented in the near future:
-- En Passant
-- Draw as a result of repitition
-- Draw as a result of  not enough pieces (for checkmate)
-- Support for some chess protocol
+
+  - En Passant
+
+  - Draw as a result of repitition
+
+  - Draw as a result of  not enough pieces (for checkmate)
+
+  - Support for some chess protocol
+
     - Player vs computer gameplay
 
 ## Credits
