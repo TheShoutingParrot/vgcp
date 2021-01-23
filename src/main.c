@@ -73,7 +73,7 @@ gameOverLoop:
 	updateWindow();
 	SDL_Delay(250);
 
-	drawGameOverText(gameWinner);
+	drawGameOverText();
 	SDL_RenderPresent(gameRenderer);
 
 	newGameButton.state = normal;
@@ -88,7 +88,7 @@ gameOverLoop:
 
 				case SDL_WINDOWEVENT:
 					updateWindow();
-					drawGameOverText(gameWinner);
+					drawGameOverText();
 					SDL_RenderPresent(gameRenderer);
 					break;
 
@@ -101,14 +101,14 @@ gameOverLoop:
 							&& event.motion.y >= newGameButton.backgroundRect.y) {
 						newGameButton.state = mouseIn;
 
-						drawGameOverText(gameWinner);
+						drawGameOverText();
 						SDL_RenderPresent(gameRenderer);
 					}
 
 					else {
 						newGameButton.state = normal;
 
-						drawGameOverText(gameWinner);
+						drawGameOverText();
 						SDL_RenderPresent(gameRenderer);
 					}
 
@@ -118,7 +118,7 @@ gameOverLoop:
 					if(newGameButton.state == mouseIn) {
 						newGameButton.state = clicked;
 
-						drawGameOverText(gameWinner);
+						drawGameOverText();
 						SDL_RenderPresent(gameRenderer);
 
 						SDL_Delay(100);
@@ -174,16 +174,26 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 
 void gameOver(bool winner) {
 	SDL_Event winEvent;
-	bool *winnerPtr;
-
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "%s checkmated, %s wins\n",
-			!winner ? "black" : "white", !winner ? "white" : "black");
+	bool *winnerPtr, *drawPtr;
 
 	winnerPtr = (bool *)malloc(sizeof(bool));
+	drawPtr = (bool *)malloc(sizeof(bool));
 	*winnerPtr = winner;
+
+	if(!(kingMated[colorBlack] || kingMated[colorWhite])) {
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "the match results in a draw\n");
+		*drawPtr = true;
+	}
+	else {
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "%s checkmated, %s wins\n",
+			!winner ? "black" : "white", !winner ? "white" : "black");
+		*drawPtr = false;
+	}
 
 	winEvent.user.type = GAMEOVER_EVENT;
 	winEvent.user.data1 = winnerPtr;
+	winEvent.user.data2 = drawPtr;
+	
 	winEvent.type = SDL_USEREVENT;
 
 	SDL_PushEvent(&winEvent);

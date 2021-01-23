@@ -26,8 +26,9 @@ void addPotentialMove(uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX) {
                 kingLocation[board[y][x].color].y = pieceY;
         }
 
-        else
+        else {
                 checkIfMated(board[y][x].color, false);
+	}
 
         if(!kingMated[board[y][x].color])
                 board[y][x].tileState |= potentialMove;
@@ -150,7 +151,8 @@ void movePiece(uint8_t y, uint8_t x) {
                                 && selectedPiece.x == 4 && selectedPiece.y == 7
                                 && x == 2 && y == 7)) {
                         SDL_Point oldSelect;
-                        oldSelect = selectedPiece;
+
+                                        oldSelect = selectedPiece;
 
                         selectedPiece.x = 0;
                         selectedPiece.y = 7;
@@ -174,7 +176,18 @@ void movePiece(uint8_t y, uint8_t x) {
         SDL_Delay(25);
 #endif
 
+	/* check if the king has been mated */
         checkIfMated(!gameTurn, true);
+
+	/* if the king is not mated but there are no potential moves for the
+	 * opposing player then it's a draw */
+	if((!kingMated[!gameTurn]) && (countAllPotentialMoves(!gameTurn) == 0)) {
+		/* reset the status of the kings */
+		kingMated[0] = false;
+		kingMated[1] = false;
+
+		gameOver(gameTurn);
+	}
 
         gameTurn = !gameTurn; /* switch the turns after a piece has moved */
 }
@@ -184,15 +197,16 @@ void checkIfMated(bool color, bool fromMove) {
 
         if(board[kingLocation[color].y][kingLocation[color].x].tileState & (color ? underThreatByWhite: underThreatByBlack)) {
                 kingMated[color] = true;
+
                 if(color && fromMove)
                         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "black king mated");
                 else if(fromMove)
                         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "white king mated");
-
-                if(!checkingIfCheckMated && fromMove)
+                if(!checkingIfCheckMated && fromMove) {
                         if(!countAllPotentialMoves(color)) {
                                 gameOver(!color);
                         }
+		}
         }
         else
                 kingMated[color] = false;

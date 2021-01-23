@@ -63,6 +63,7 @@ bool loadMedia(void) {
         textTexture[0] = renderText("CHECKMATE", textColor);
         textTexture[1] = renderText("Black wins", textColor);
         textTexture[2] = renderText("White wins", textColor);
+	textTexture[3] = renderText("Draw", textColor);
 
         newGameButton.texture[normal] = renderText("New Game", textColor);
 
@@ -75,12 +76,12 @@ bool loadMedia(void) {
 
         newGameButton.rect.w = 180;
         newGameButton.rect.h = 60;
-        newGameButton.rect.x = (GAME_WINDOW_WIDTH / 2) - (newGameButton.rect.w / 2);
+        newGameButton.rect.x = (GAME_LOGICAL_WIDTH / 2) - (newGameButton.rect.w / 2);
         newGameButton.rect.y = 295;
 
         newGameButton.backgroundRect.w = 200;
         newGameButton.backgroundRect.h = 70;
-        newGameButton.backgroundRect.x = (GAME_WINDOW_WIDTH / 2) - (newGameButton.backgroundRect.w / 2);
+        newGameButton.backgroundRect.x = (GAME_LOGICAL_WIDTH / 2) - (newGameButton.backgroundRect.w / 2);
         newGameButton.backgroundRect.y = 285;
 
         newGameButton.backgroundColor[normal].r = 0x00;

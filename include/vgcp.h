@@ -15,13 +15,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define PROGRAM_VERSION         "00-0000"
+/* vgcp's version (MAJOR-MINOR) */
+#define PROGRAM_VERSION         "00-0001"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
 #define GAME_LOGICAL_HEIGHT     800
-#define GAME_WINDOW_WIDTH       800
-#define GAME_WINDOW_HEIGHT      800
+#define GAME_WINDOW_WIDTH       1000
+#define GAME_WINDOW_HEIGHT      1000
 
 
 #define BOARD_FIRST_ROW(c)      {{rook, c, normalState, false}, {knight, c, normalState, false}, {bishop, c, normalState, false}, {queen, c, normalState, false}, {king, c, normalState, false}, {bishop, c, normalState, false}, {knight, c, normalState, false}, {rook, c, normalState, false}}
@@ -118,7 +119,7 @@ struct tile board[8][8];
 extern char *pieceName[empty];
 
 SDL_Texture     *pieceTexture[empty][2];
-SDL_Texture     *textTexture[3];
+SDL_Texture     *textTexture[4];
 struct button   newGameButton; 
 
 TTF_Font        *gameFont;
@@ -140,7 +141,7 @@ void initBoard(void);
 void updateWindow(void);
 void drawBoard(void);
 void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y); 
-void drawGameOverText(bool winner);
+void drawGameOverText(void);
 SDL_Texture *loadTexture(char *path);
 SDL_Texture *renderText(char *textStr, SDL_Color textColor);
 
