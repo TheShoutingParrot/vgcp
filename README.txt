@@ -17,12 +17,14 @@ Features
 Here's a list of currently supported features:
 	- All chess pieces moving correctly
 		- Castling
-	- Checkmate and victory
 	- Player vs player gameplay
+		- Checkmate and victory
+	- Draw (as a result of a stalemate)
 
 Here's a list of features that will (hopefully) be implemented in the near future:
 	- En Passant
-	- Draw
+	- Draw as a result of repitition
+	- Draw as a result of  not enough pieces (for checkmate)
 	- Support for some chess protocol
 		- Player vs computer gameplay
 

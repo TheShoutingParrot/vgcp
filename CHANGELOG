@@ -1,0 +1,17 @@
+Victor's Graphical Chess Program's CHANGELOG
+Here you can find a somewhat curated and chronological list of notable changes
+The following entries deal mostly with changes to the actual software not with changes to the documentation, etc.
+NOTE: These entries may not contain every single minor change but should contain all major changes
+
+2021-01-23	version 00-0001
+	Added a draw as a possible result of a match.
+	NOTE: Currently a match can only result in a draw as a result of a stalemate.
+
+	source file changes
+		* src/move.c (movePiece): now checks for stalemate after a move
+		* src/draw.c (drawGameOverText): now (if a match results in a draw) the text is "DRAW"
+		* src/main.c (gameOver): now handles matches that result in a draw
+
+	header file changes
+		* include/vgcp.h: updated function prototypes,
+			changed the default window size to 1000x1000
