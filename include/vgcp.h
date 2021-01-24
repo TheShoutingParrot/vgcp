@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0001"
+#define PROGRAM_VERSION         "00-0002"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -27,7 +27,7 @@
 
 #define BOARD_FIRST_ROW(c)      {{rook, c, normalState, false}, {knight, c, normalState, false}, {bishop, c, normalState, false}, {queen, c, normalState, false}, {king, c, normalState, false}, {bishop, c, normalState, false}, {knight, c, normalState, false}, {rook, c, normalState, false}}
 #define BOARD_SECOND_ROW(c)     {{pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}}
-#define BOARD_EMPTY_ROW         {{empty, 0, normalState, false}, {empty, 0, normalState, false}, {empty, 0, normalState, false}, {empty, 0, normalState, false}, {empty, 0, normalState, false}, {empty, 0, normalState, false}, {empty, 0, normalState, false}, {empty, 0, normalState, false}}
+#define BOARD_EMPTY_ROW         {{empty, noColor, normalState, false}, {empty, noColor, normalState, false}, {empty, noColor, normalState, false}, {empty, noColor, normalState, false}, {empty, noColor, normalState, false}, {empty, noColor, normalState, false}, {empty, noColor, normalState, false}, {empty, noColor, normalState, false}}
 
 #define BOARD_ROW_REVERSE(y)    (7 - y)
 
@@ -40,6 +40,8 @@
 #define PLUS_OR_MINUS(c, x)     + (c ? -x : x)
 
 #define COLOR_INT_TO_STR(c)     (c == colorWhite ? "white" : "black")
+
+#define OPPOSITE_COLOR(c)	(c == colorWhite ? colorBlack : colorWhite)
 
 #ifdef _INSTALL
 #define ASSETS_PATH             _INSTALL_PREFIX "assets/"
@@ -56,10 +58,11 @@
 #define ESCAPE_CODE_BOLD        "1"
 #define ESCAPE_CODE_RED         "31"
 
-enum color {
-        colorWhite = false,
-        colorBlack = true,
-};
+typedef enum color {
+        colorWhite 	= 0,
+        colorBlack 	= 1,
+	noColor 	= 2,
+} color_t;
 
 enum pieces {
         pawn,
@@ -91,7 +94,7 @@ enum buttonStates {
 
 struct tile {
         uint8_t         piece;
-        bool            color;
+        color_t		color;
         uint8_t         tileState;
         bool            pieceHasMoved;
 };
@@ -109,7 +112,7 @@ SDL_Renderer    *gameRenderer;
 
 extern SDL_Point	selectedPiece,
 			kingLocation[2];
-bool            	gameTurn;
+color_t			gameTurn;
 extern bool		kingMated[2],
                 	checkingIfCheckMated;
 
@@ -130,7 +133,7 @@ extern int8_t potentialKnight[4][2];
 
 /* main.c */
 void handleMousebuttonEvent(SDL_MouseButtonEvent event);
-void gameOver(bool winner);
+void gameOver(color_t winner);
 
 /* init.c*/
 bool init(void);
@@ -141,15 +144,15 @@ void initBoard(void);
 void updateWindow(void);
 void drawBoard(void);
 void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y); 
-void drawGameOverText(void);
+void drawGameOverText(color_t winner);
 SDL_Texture *loadTexture(char *path);
 SDL_Texture *renderText(char *textStr, SDL_Color textColor);
 
 /* move.c */
 void addPotentialMove(uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX);
-uint8_t countAllPotentialMoves(bool color);
+uint8_t countAllPotentialMoves(color_t color);
 void movePiece(uint8_t y, uint8_t x);
-void checkIfMated(bool color, bool fromMove);
+void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
 
 /* select.c */

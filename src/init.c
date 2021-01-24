@@ -61,8 +61,8 @@ bool loadMedia(void) {
 
         gameFont = TTF_OpenFont(FONT_PATH"steel.ttf", 50);
         textTexture[0] = renderText("CHECKMATE", textColor);
-        textTexture[1] = renderText("Black wins", textColor);
-        textTexture[2] = renderText("White wins", textColor);
+        textTexture[1] = renderText("White wins", textColor);
+        textTexture[2] = renderText("Black wins", textColor);
 	textTexture[3] = renderText("Draw", textColor);
 
         newGameButton.texture[normal] = renderText("New Game", textColor);

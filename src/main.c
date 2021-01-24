@@ -22,15 +22,14 @@ char *pieceName[empty] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
 int8_t potentialKnight[4][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
 
 int main(void) {
-	bool gameWinner;
+	color_t gameWinner;
 
 	puts("version: "PROGRAM_VERSION);
 
 	gameTurn = colorWhite;
 
-	if(init()) {
+	if(init())
 		die("Initialization failed");
-	}
 
 	initBoard();
 
@@ -58,7 +57,7 @@ mainGameLoop:
 					break;
 
 				case SDL_USEREVENT:
-					gameWinner = *((bool *)event.user.data1);
+					gameWinner = *((color_t *)event.user.data1);
 					goto gameOverLoop;
 
 					break;
@@ -73,8 +72,10 @@ gameOverLoop:
 	updateWindow();
 	SDL_Delay(250);
 
-	drawGameOverText();
+	drawGameOverText(gameWinner);
 	SDL_RenderPresent(gameRenderer);
+
+	SDL_Delay(250);
 
 	newGameButton.state = normal;
 
@@ -88,7 +89,7 @@ gameOverLoop:
 
 				case SDL_WINDOWEVENT:
 					updateWindow();
-					drawGameOverText();
+					drawGameOverText(gameWinner);
 					SDL_RenderPresent(gameRenderer);
 					break;
 
@@ -101,14 +102,14 @@ gameOverLoop:
 							&& event.motion.y >= newGameButton.backgroundRect.y) {
 						newGameButton.state = mouseIn;
 
-						drawGameOverText();
+						drawGameOverText(gameWinner);
 						SDL_RenderPresent(gameRenderer);
 					}
 
 					else {
 						newGameButton.state = normal;
 
-						drawGameOverText();
+						drawGameOverText(gameWinner);
 						SDL_RenderPresent(gameRenderer);
 					}
 
@@ -118,7 +119,7 @@ gameOverLoop:
 					if(newGameButton.state == mouseIn) {
 						newGameButton.state = clicked;
 
-						drawGameOverText();
+						drawGameOverText(gameWinner);
 						SDL_RenderPresent(gameRenderer);
 
 						SDL_Delay(100);
@@ -172,27 +173,22 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 	updateBoard();
 }
 
-void gameOver(bool winner) {
+void gameOver(color_t winner) {
+	printf("game winner %d\n", winner);
 	SDL_Event winEvent;
-	bool *winnerPtr, *drawPtr;
+	color_t *winnerPtr;
 
-	winnerPtr = (bool *)malloc(sizeof(bool));
-	drawPtr = (bool *)malloc(sizeof(bool));
-	*winnerPtr = winner;
+	winnerPtr = (color_t *)malloc(sizeof(color_t));
 
-	if(!(kingMated[colorBlack] || kingMated[colorWhite])) {
+	if(winner == noColor)
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "the match results in a draw\n");
-		*drawPtr = true;
-	}
-	else {
+	else
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "%s checkmated, %s wins\n",
-			!winner ? "black" : "white", !winner ? "white" : "black");
-		*drawPtr = false;
-	}
+			COLOR_INT_TO_STR(!winner), COLOR_INT_TO_STR(winner));
+	*winnerPtr = winner;
 
 	winEvent.user.type = GAMEOVER_EVENT;
 	winEvent.user.data1 = winnerPtr;
-	winEvent.user.data2 = drawPtr;
 	
 	winEvent.type = SDL_USEREVENT;
 

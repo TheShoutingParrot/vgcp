@@ -97,36 +97,31 @@ void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y) {
 	}
 }
 
-void drawGameOverText(void) {
+void drawGameOverText(color_t winner) {
         SDL_Rect dstRect;
 	uint8_t text;
 
-	if(!kingMated[colorBlack] && !kingMated[colorWhite])
-		text = 3;
-	else if(kingMated[colorBlack])
-		text = 2;
-	else
-		text = 1;
+	text = winner + 1;
 
         /* render text background */
-	if(text == 3) {
+	if(winner == noColor) {
         	dstRect.w = 240;
 	        dstRect.h = 110;
         	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
-	        dstRect.y = 95;
 	}
 	else {
         	dstRect.w = 440;
 	        dstRect.h = 110;
         	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
-	        dstRect.y = 95;
 	}
+
+        dstRect.y = 95;
 
         SDL_SetRenderDrawColor(gameRenderer, 0x00, 0x00, 0x00, 0xff);
         SDL_RenderFillRect(gameRenderer, &dstRect);
 
 	/* render "DRAW" text (if the match resulted in a draw) */
-	if(text == 3) {
+	if(winner == noColor) {
         	dstRect.w = 200;
 	        dstRect.h = 100;
         	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
@@ -145,7 +140,7 @@ void drawGameOverText(void) {
 
 	/* render x player wins only if the game didn't result
 	 * in a draw */
-	if(text != 3) {
+	if(winner != noColor) {
         	/* render text background */
 	        dstRect.w = 220;
 	        dstRect.h = 70;

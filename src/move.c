@@ -42,7 +42,7 @@ void addPotentialMove(uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX) {
         updateBoard();
 }
 
-uint8_t countAllPotentialMoves(bool color) {
+uint8_t countAllPotentialMoves(color_t color) {
         uint8_t x, y,
                 result;
 
@@ -177,22 +177,20 @@ void movePiece(uint8_t y, uint8_t x) {
 #endif
 
 	/* check if the king has been mated */
-        checkIfMated(!gameTurn, true);
+        checkIfMated(OPPOSITE_COLOR(gameTurn), true);
 
 	/* if the king is not mated but there are no potential moves for the
 	 * opposing player then it's a draw */
-	if((!kingMated[!gameTurn]) && (countAllPotentialMoves(!gameTurn) == 0)) {
+	if((!kingMated[OPPOSITE_COLOR(gameTurn)]) 
+			&& (countAllPotentialMoves(OPPOSITE_COLOR(gameTurn)) == 0)) {
 		/* reset the status of the kings */
-		kingMated[0] = false;
-		kingMated[1] = false;
-
-		gameOver(gameTurn);
+		gameOver(noColor);
 	}
 
-        gameTurn = !gameTurn; /* switch the turns after a piece has moved */
+        gameTurn = OPPOSITE_COLOR(gameTurn); /* switch the turns after a piece has moved */
 }
 
-void checkIfMated(bool color, bool fromMove) {
+void checkIfMated(color_t color, bool fromMove) {
         updateBoard();
 
         if(board[kingLocation[color].y][kingLocation[color].x].tileState & (color ? underThreatByWhite: underThreatByBlack)) {
@@ -204,7 +202,8 @@ void checkIfMated(bool color, bool fromMove) {
                         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "white king mated");
                 if(!checkingIfCheckMated && fromMove) {
                         if(!countAllPotentialMoves(color)) {
-                                gameOver(!color);
+				printf("%d winner %d\n", color, OPPOSITE_COLOR(color));
+                                gameOver(OPPOSITE_COLOR(color));
                         }
 		}
         }

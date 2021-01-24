@@ -15,3 +15,15 @@ NOTE: These entries may not contain every single minor change but should contain
 	header file changes
 		* include/vgcp.h: updated function prototypes,
 			changed the default window size to 1000x1000
+
+2021-01-24	version 00-0002
+	Made the code nicer (switched the color variable(s) to "color_t" from "bool") and made other optimizations.
+
+	source file changes
+		* (almost) all: switched color variables to "color_t",
+			optimized code
+
+	header file changes
+		* inclue/vgcp.h: created new macros,
+			created the "color_t" type,
+			updated function prototypes
