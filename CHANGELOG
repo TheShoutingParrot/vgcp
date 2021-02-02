@@ -42,3 +42,12 @@ NOTE: These entries may not contain every single minor change but should contain
 		* include/vgcp.h: updated function prototypes,
 			now warns of _NO_PERSPECTIVE_CHANGE not being enabled,
 			created the structure "move"
+
+2021-02-02	version 00-0004
+	Created the "label" structure, optimized code, etc
+
+	source file changes
+		* src/init.c (loadMedia): now uses the "label" structure,
+			loads the texture rectangle & background during creation and not during drawing.
+		* src/draw.c (drawGameOverText): uses the "label" structure now
+		* src/piece.c (mapKingPotentialMoves): optimized castling

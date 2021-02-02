@@ -89,7 +89,8 @@ void mapRookPotentialMoves(uint8_t x, uint8_t y, uint8_t state) {
 			if((state & potentialMove)
                                 && (board[y][potential.x].piece != empty)
                                 && (board[y][potential.x].color == board[y][x].color));
-                        else if(state & potentialMove)                                addPotentialMove(y, potential.x, y, x);
+                        else if(state & potentialMove)
+				addPotentialMove(y, potential.x, y, x);
                         else
                                 board[y][potential.x].tileState |= state;
 
@@ -119,6 +120,7 @@ void mapRookPotentialMoves(uint8_t x, uint8_t y, uint8_t state) {
                 }
         }
 }
+
 void mapKingPotentialMoves(uint8_t x, uint8_t y, uint8_t state, bool fromMove) {
         SDL_Point potential;
 
@@ -159,13 +161,9 @@ void mapKingPotentialMoves(uint8_t x, uint8_t y, uint8_t state, bool fromMove) {
                         }
                 }
 
-                if(board[y][x].color == colorWhite
-                                && !board[0][7].pieceHasMoved && board[0][7].piece == rook) {
-                        addPotentialMove(0, 6, y, x);
-                }
-                if(board[y][x].color == colorBlack
-                                && !board[7][7].pieceHasMoved && board[7][7].piece == rook) {
-                        addPotentialMove(7, 6, y, x);
+                if(!board[BOARD_ROW_PLAYER(0, board[y][x].color)][7].pieceHasMoved 
+				&& board[BOARD_ROW_PLAYER(0, board[y][x].color)][7].piece == rook) {
+                        addPotentialMove(BOARD_ROW_PLAYER(0, board[y][x].color), 6, y, x);
                 }
 
                 /* long castle */
@@ -176,16 +174,14 @@ longCastle:
                 for(potential.x = 3; potential.x > 1; potential.x--)  {
                         if(board[potential.y][potential.x].piece == empty);
                         else {
-                                goto endKingMoveMapping;                        }
+                                goto endKingMoveMapping;
+			}
                 }
 
-                if(board[y][x].color == colorWhite
-                                && !board[0][0].pieceHasMoved && board[0][0].piece == rook) {
-                        addPotentialMove(0, 2, y, x);                }
-                if(board[y][x].color == colorBlack
-                                && !board[7][0].pieceHasMoved && board[7][0].piece == rook) {
-                        addPotentialMove(7, 2, y, x);
-                }
+                if(!board[BOARD_ROW_PLAYER(0, board[y][x].color)][0].pieceHasMoved
+				&& board[BOARD_ROW_PLAYER(0, board[y][x].color)][0].piece == rook) {
+                        addPotentialMove(BOARD_ROW_PLAYER(0, board[y][x].color), 2, y, x);
+		}
         }
 
 endKingMoveMapping:

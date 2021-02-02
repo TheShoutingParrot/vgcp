@@ -109,54 +109,33 @@ void drawGameOverText(color_t winner) {
 	        dstRect.h = 110;
         	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
 	}
-	else {
-        	dstRect.w = 440;
-	        dstRect.h = 110;
-        	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
-	}
 
         dstRect.y = 95;
 
-        SDL_SetRenderDrawColor(gameRenderer, 0x00, 0x00, 0x00, 0xff);
-        SDL_RenderFillRect(gameRenderer, &dstRect);
-
 	/* render "DRAW" text (if the match resulted in a draw) */
 	if(winner == noColor) {
-        	dstRect.w = 200;
-	        dstRect.h = 100;
-        	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
-	        dstRect.y = 110;
-	        SDL_RenderCopy(gameRenderer, textTexture[text], NULL, &dstRect);
+        	SDL_SetRenderDrawColor(gameRenderer, 0x00, 0x00, 0x00, 0xff);
+	        SDL_RenderFillRect(gameRenderer, &(textTexture[3].background));
+
+	        SDL_RenderCopy(gameRenderer, textTexture[text].texture, NULL, &(textTexture[3].rect));
 	}
 
         /* render "CHECKMATE" text */
 	else { 
-        	dstRect.w = 400;
-	        dstRect.h = 100;
-        	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
-	        dstRect.y = 110;
-	        SDL_RenderCopy(gameRenderer, textTexture[0], NULL, &dstRect);
+	        SDL_SetRenderDrawColor(gameRenderer, 0x00, 0x00, 0x00, 0xff);
+        	SDL_RenderFillRect(gameRenderer, &(textTexture[0].background));
+
+	        SDL_RenderCopy(gameRenderer, textTexture[0].texture, NULL, &(textTexture[0].rect));
 	}
 
 	/* render x player wins only if the game didn't result
 	 * in a draw */
 	if(winner != noColor) {
-        	/* render text background */
-	        dstRect.w = 220;
-	        dstRect.h = 70;
-        	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
-	        dstRect.y = 210;
-
 	        SDL_SetRenderDrawColor(gameRenderer, 0x00, 0x00, 0x00, 0xff);
-        	SDL_RenderFillRect(gameRenderer, &dstRect);
+        	SDL_RenderFillRect(gameRenderer, &(textTexture[text].background));
         	
 		/* render "(player color) wins" */
-	        dstRect.w = 200;
-	        dstRect.h = 60;
-        	dstRect.x = (GAME_LOGICAL_WIDTH / 2) - (dstRect.w / 2);
-	        dstRect.y = 220;
-
-	        SDL_RenderCopy(gameRenderer, textTexture[text], NULL, &dstRect);
+	        SDL_RenderCopy(gameRenderer, textTexture[text].texture, NULL, &(textTexture[text].rect));
 	}
 
 	/* render "new game" button (text and background) */

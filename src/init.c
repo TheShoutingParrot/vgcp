@@ -60,10 +60,46 @@ bool loadMedia(void) {
         SDL_Color textColor = {0xff, 0xff, 0xff};
 
         gameFont = TTF_OpenFont(FONT_PATH"steel.ttf", 50);
-        textTexture[0] = renderText("CHECKMATE", textColor);
-        textTexture[1] = renderText("White wins", textColor);
-        textTexture[2] = renderText("Black wins", textColor);
-	textTexture[3] = renderText("Draw", textColor);
+        textTexture[0].texture = renderText("CHECKMATE", textColor);
+        textTexture[1].texture = renderText("White wins", textColor);
+        textTexture[2].texture = renderText("Black wins", textColor);
+	textTexture[3].texture = renderText("Draw", textColor);
+
+	textTexture[0].rect.w = 400;
+	textTexture[0].rect.h = 100;
+	textTexture[0].rect.x = (GAME_LOGICAL_WIDTH / 2) - (textTexture[0].rect.w  / 2);
+	textTexture[0].rect.y = 110;
+
+	textTexture[0].background.w = 440;
+	textTexture[0].background.h = 110;
+	textTexture[0].background.x = (GAME_LOGICAL_WIDTH / 2) - (textTexture[0].background.w / 2);
+	textTexture[0].background.y = 95;
+
+	textTexture[1].rect.w = 200;
+	textTexture[1].rect.h = 60;
+	textTexture[1].rect.x = (GAME_LOGICAL_WIDTH / 2) - (textTexture[1].rect.w  / 2);
+	textTexture[1].rect.y = 220;
+
+	textTexture[1].background.w = 220;
+	textTexture[1].background.h = 70;
+	textTexture[1].background.x = (GAME_LOGICAL_WIDTH / 2) - (textTexture[1].background.w / 2);
+	textTexture[1].background.y = 210;
+
+	/* "black wins" rect & background is the same as
+	 * "white wins" rect & background */
+
+	textTexture[2].rect = textTexture[1].rect;
+	textTexture[2].background = textTexture[1].background;
+
+	textTexture[3].rect.w = 200;
+	textTexture[3].rect.h = 100;
+	textTexture[3].rect.x = (GAME_LOGICAL_WIDTH / 2) - (textTexture[3].rect.w  / 2);
+	textTexture[3].rect.y = 110;
+
+	textTexture[3].background.w = 240;
+	textTexture[3].background.h = 110;
+	textTexture[3].background.x = (GAME_LOGICAL_WIDTH / 2) - (textTexture[3].background.w  / 2);
+	textTexture[3].background.y = 95;
 
         newGameButton.texture[normal] = renderText("New Game", textColor);
 

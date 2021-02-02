@@ -33,6 +33,7 @@ int main(void) {
 
 	color_t gameWinner;
 
+
 	gameTurn = colorWhite;
 
 	if(init())

@@ -20,7 +20,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0003"
+#define PROGRAM_VERSION         "00-0004"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -117,6 +117,12 @@ struct button {
         uint8_t         state;
 };
 
+struct labels {
+	SDL_Texture	*texture;
+	SDL_Rect	rect,
+			background;
+};
+
 struct move {
 	SDL_Point	to,
 		  	from;
@@ -141,7 +147,7 @@ struct tile board[8][8];
 extern char *pieceName[empty];
 
 SDL_Texture     *pieceTexture[empty][2];
-SDL_Texture     *textTexture[4];
+struct labels	textTexture[4];
 struct button   newGameButton; 
 
 TTF_Font        *gameFont;
