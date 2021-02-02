@@ -22,9 +22,16 @@ char *pieceName[empty] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
 int8_t potentialKnight[4][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
 
 int main(void) {
-	color_t gameWinner;
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "version: "PROGRAM_VERSION);
 
-	puts("version: "PROGRAM_VERSION);
+#ifdef _DEBUG
+	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "debug option is on! You've been warned!");
+#endif
+#ifndef _NO_PERSPECTIVE_CHANGE
+	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "_NO_PERSPECTIVE_CHANGE option is off! The program may not work properly as a result of this.");
+#endif
+
+	color_t gameWinner;
 
 	gameTurn = colorWhite;
 
@@ -36,6 +43,8 @@ int main(void) {
 	SDL_Event event;
 
 mainGameLoop:
+	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "game begins");
+
 	updateWindow();
 	updateBoard();
 
@@ -163,8 +172,19 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 		selectPiece(y, x);
 
 	else if(selectedPiece.x != -1) {
-		if(board[y][x].tileState & potentialMove)
-			movePiece(y, x);
+		if(board[y][x].tileState & potentialMove) {
+			struct move move;
+
+			move.to.x = x;
+			move.to.y = y;
+			move.from = selectedPiece;
+			move.color = board[move.from.y][move.from.x].color;
+			move.piece = board[move.from.y][move.from.x].piece;
+
+			deselectPiece();
+			movePiece(move);
+			gameTurn = OPPOSITE_COLOR(gameTurn);
+		}
 
 		else
 			deselectPiece();
@@ -174,7 +194,6 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 }
 
 void gameOver(color_t winner) {
-	printf("game winner %d\n", winner);
 	SDL_Event winEvent;
 	color_t *winnerPtr;
 

@@ -27,3 +27,18 @@ NOTE: These entries may not contain every single minor change but should contain
 		* inclue/vgcp.h: created new macros,
 			created the "color_t" type,
 			updated function prototypes
+
+2021-02-02	version 00-0003
+	Now warns user on runtime when using the _DEBUG and warns user on runtime & compilation when the _NO_PERSPECTIVE_CHANGE is disabled,
+	now moves use the structure "move"
+
+	source file changes
+		* src/main.c (main): Now warns of "unwanted" options being used on runtime (_DEBUG & _NO_PERSPECTIVE_CHANGE)
+		* src/main.c (handleMousebuttonEvent): Updated function call to movePiece
+		* src/move.c (movePiece): updated function arguments, optimized handling of castling,
+			now uses the structure "move"
+
+	header file changes
+		* include/vgcp.h: updated function prototypes,
+			now warns of _NO_PERSPECTIVE_CHANGE not being enabled,
+			created the structure "move"

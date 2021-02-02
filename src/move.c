@@ -72,101 +72,52 @@ uint8_t countAllPotentialMoves(color_t color) {
         return result;
 }
 
-
-void movePiece(uint8_t y, uint8_t x) {
-        board[y][x].piece = board[selectedPiece.y][selectedPiece.x].piece;
-        board[y][x].color = board[selectedPiece.y][selectedPiece.x].color;
-        board[y][x].pieceHasMoved = true;
-        board[selectedPiece.y][selectedPiece.x].piece = empty;
-
+void movePiece(struct move move) {
+        board[move.to.y][move.to.x].piece = move.piece;
+        board[move.to.y][move.to.x].color = move.color;
+        board[move.to.y][move.to.x].pieceHasMoved = true;
+        board[move.from.y][move.from.x].piece = empty;
 
         /* when a pawn gets to the last row of the defense the pawn
          * becomes a queen, rook, bishop or knight */
-        if(board[y][x].piece == pawn
+        if(move.piece == pawn
 #ifndef _NO_PERSPECTIVE_CHANGE
-                        && y == BOARD_ROW(7, board[y][x].color)
+                        && move.to.y == BOARD_ROW(7, board[move.to.y][move.to.x].color)
 #else
-                        && y == (board[y][x].color ? 0 : 7)
+                        && move.to.y == (board[move.to.y][move.to.x].color ? 0 : 7)
 #endif
         ) {
                 SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "a pawn has been promoted");
-                board[y][x].piece = queen; /* TODO: menu to choose which piece */
+                board[move.to.y][move.to.x].piece = queen; /* TODO: menu to choose which piece */
         }
-        else if(board[y][x].piece == king) {
-                kingLocation[gameTurn].x = x;
-                kingLocation[gameTurn].y = y;
+        else if(move.piece == king) {
+		struct move castlingMove;
+
+                kingLocation[gameTurn].x = move.to.x;
+                kingLocation[gameTurn].y = move.to.y;
+
+		castlingMove.piece = rook;
+		castlingMove.color = move.color;
 
                 /* this means that the king is castling so we must 
                  * move the rook also */
-                if((board[selectedPiece.y][selectedPiece.x].color == colorWhite
-                                && selectedPiece.x == 4 && selectedPiece.y == 0
-                                && x == 6 && y == 0)) {
-                        SDL_Point oldSelect;
-                        oldSelect = selectedPiece;
-
-                        selectedPiece.x = 7;
-                        selectedPiece.y = 0;
-
-                        movePiece(0, 5);
-                        /* because we call movePiece we need to correct the
-                         * game turn */
-                        gameTurn = colorWhite;
-
-                        selectedPiece = oldSelect;
+                if(move.from.x == 4 && move.from.y == BOARD_ROW_PLAYER(0, move.color)
+                                && move.to.x == 6 && move.to.y == BOARD_ROW_PLAYER(0, move.color)) {
+			castlingMove.to.x = 5;
+			castlingMove.to.y = BOARD_ROW_PLAYER(0, move.color);
+                        castlingMove.from.x = 7;
+                        castlingMove.from.y = BOARD_ROW_PLAYER(0, move.color);
+			movePiece(castlingMove);
                 }
-                else if((board[selectedPiece.y][selectedPiece.x].color == colorBlack
-                                && selectedPiece.x == 4 && selectedPiece.y == 7
-                                && x == 6 && y == 7)) {
-                        SDL_Point oldSelect;
-                        oldSelect = selectedPiece;
-
-                        selectedPiece.x = 7;
-                        selectedPiece.y = 7;
-
-                        movePiece(7, 5);
-                        /* because we call movePiece we need to correct the
-                         * game turn */
-                        gameTurn = colorBlack;
-
-                        selectedPiece = oldSelect;
-                }
-
-                if((board[selectedPiece.y][selectedPiece.x].color == colorWhite
-                                && selectedPiece.x == 4 && selectedPiece.y == 0
-                                && x == 2 && y == 0)) {
-                        SDL_Point oldSelect;
-                        oldSelect = selectedPiece;
-
-                        selectedPiece.x = 0;
-                        selectedPiece.y = 0;
-
-                        movePiece(0, 3);
-                        /* because we call movePiece we need to correct the
-                         * game turn */
-                        gameTurn = colorWhite;
-
-                        selectedPiece = oldSelect;
-                }
-                else if((board[selectedPiece.y][selectedPiece.x].color == colorBlack
-                                && selectedPiece.x == 4 && selectedPiece.y == 7
-                                && x == 2 && y == 7)) {
-                        SDL_Point oldSelect;
-
-                                        oldSelect = selectedPiece;
-
-                        selectedPiece.x = 0;
-                        selectedPiece.y = 7;
-
-                        movePiece(7, 3);
-                        /* because we call movePiece we need to correct the
-                         * game turn */
-                        gameTurn = colorBlack;
-
-                        selectedPiece = oldSelect;
+		else if((move.from.x == 4 && move.from.y == BOARD_ROW_PLAYER(0, move.color)
+                                && move.to.x == 2 && move.to.y == BOARD_ROW_PLAYER(0, move.color))) {
+                        castlingMove.to.x = 3;
+			castlingMove.to.y = BOARD_ROW_PLAYER(0, move.color);
+                        castlingMove.from.x = 0;
+                        castlingMove.from.y = BOARD_ROW_PLAYER(0, move.color);
+			movePiece(castlingMove);
                 }
         }
-
-        deselectPiece();
 
         updateWindow();
 
@@ -186,8 +137,6 @@ void movePiece(uint8_t y, uint8_t x) {
 		/* reset the status of the kings */
 		gameOver(noColor);
 	}
-
-        gameTurn = OPPOSITE_COLOR(gameTurn); /* switch the turns after a piece has moved */
 }
 
 void checkIfMated(color_t color, bool fromMove) {
@@ -202,7 +151,6 @@ void checkIfMated(color_t color, bool fromMove) {
                         SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "white king mated");
                 if(!checkingIfCheckMated && fromMove) {
                         if(!countAllPotentialMoves(color)) {
-				printf("%d winner %d\n", color, OPPOSITE_COLOR(color));
                                 gameOver(OPPOSITE_COLOR(color));
                         }
 		}

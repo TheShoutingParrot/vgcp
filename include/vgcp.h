@@ -7,6 +7,10 @@
 #warning "DEBUG OPTION IS ON!!"
 #endif
 
+#ifndef _NO_PERSPECTIVE_CHANGE
+#warning "_NO_PERSPECTIVE_CHANGE option is off! Currently not working properly!!! Please turn it back on (if you aren't debugging / fixing the issue)"
+#endif
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -16,7 +20,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0002"
+#define PROGRAM_VERSION         "00-0003"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -36,6 +40,8 @@
 #else
 #define BOARD_ROW(y, r)         (BOARD_ROW_REVERSE(y))
 #endif
+
+#define BOARD_ROW_PLAYER(y, r)	(r ? BOARD_ROW_REVERSE(y) : y)
 
 #define PLUS_OR_MINUS(c, x)     + (c ? -x : x)
 
@@ -57,6 +63,8 @@
 #define ESCAPE_CODE_RESET       "0"
 #define ESCAPE_CODE_BOLD        "1"
 #define ESCAPE_CODE_RED         "31"
+
+/* enums */
 
 typedef enum color {
         colorWhite 	= 0,
@@ -92,6 +100,8 @@ enum buttonStates {
         allButtonStates,
 };
 
+/* structs */
+
 struct tile {
         uint8_t         piece;
         color_t		color;
@@ -107,6 +117,15 @@ struct button {
         uint8_t         state;
 };
 
+struct move {
+	SDL_Point	to,
+		  	from;
+	color_t		color;
+	uint8_t		piece;
+};
+
+/* variables */
+
 SDL_Window      *gameWindow;
 SDL_Renderer    *gameRenderer;
 
@@ -114,7 +133,7 @@ extern SDL_Point	selectedPiece,
 			kingLocation[2];
 color_t			gameTurn;
 extern bool		kingMated[2],
-                	checkingIfCheckMated;
+			checkingIfCheckMated;
 
 extern struct tile unusedBoard[8][8];
 struct tile board[8][8];
@@ -129,7 +148,7 @@ TTF_Font        *gameFont;
 
 extern int8_t potentialKnight[4][2];
 
-/* function prototypes*/
+/* function prototypes (files can be all found in the "src/" directory) */
 
 /* main.c */
 void handleMousebuttonEvent(SDL_MouseButtonEvent event);
@@ -151,7 +170,7 @@ SDL_Texture *renderText(char *textStr, SDL_Color textColor);
 /* move.c */
 void addPotentialMove(uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX);
 uint8_t countAllPotentialMoves(color_t color);
-void movePiece(uint8_t y, uint8_t x);
+void movePiece(struct move move);
 void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
 

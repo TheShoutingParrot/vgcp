@@ -4,6 +4,8 @@ vgcp is a simple graphical chess UI which uses SDL2 and is written in C.
 
 Usage
 
+If you wish to edit the software's (compilation) options then edit the definitions in "include/config.h".
+
 Without Installation
 
 To compile this program, run "make" on the "vgcp/" directory. To run the program simply run "./vgcp".
