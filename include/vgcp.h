@@ -20,14 +20,13 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0004"
+#define PROGRAM_VERSION         "00-0005"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
 #define GAME_LOGICAL_HEIGHT     800
 #define GAME_WINDOW_WIDTH       1000
 #define GAME_WINDOW_HEIGHT      1000
-
 
 #define BOARD_FIRST_ROW(c)      {{rook, c, normalState, false}, {knight, c, normalState, false}, {bishop, c, normalState, false}, {queen, c, normalState, false}, {king, c, normalState, false}, {bishop, c, normalState, false}, {knight, c, normalState, false}, {rook, c, normalState, false}}
 #define BOARD_SECOND_ROW(c)     {{pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}}
@@ -130,6 +129,12 @@ struct move {
 	uint8_t		piece;
 };
 
+struct moveList {
+	struct move	*moves;
+	uint16_t	n;
+	uint32_t	allocated;
+};
+
 /* variables */
 
 SDL_Window      *gameWindow;
@@ -153,6 +158,8 @@ struct button   newGameButton;
 TTF_Font        *gameFont;
 
 extern int8_t potentialKnight[4][2];
+
+struct moveList moves;
 
 /* function prototypes (files can be all found in the "src/" directory) */
 
@@ -179,6 +186,12 @@ uint8_t countAllPotentialMoves(color_t color);
 void movePiece(struct move move);
 void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
+
+/* move_list.c */
+void initMoveList(void);
+void removeMoveList(void);
+void addToMoveList(struct move newMove);
+void printMoveList(void);
 
 /* select.c */
 void selectPiece(uint8_t y, uint8_t x);

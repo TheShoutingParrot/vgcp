@@ -78,6 +78,12 @@ void movePiece(struct move move) {
         board[move.to.y][move.to.x].pieceHasMoved = true;
         board[move.from.y][move.from.x].piece = empty;
 
+	addToMoveList(move);
+
+#ifdef _DEBUG
+	printMoveList();
+#endif
+
         /* when a pawn gets to the last row of the defense the pawn
          * becomes a queen, rook, bishop or knight */
         if(move.piece == pawn

@@ -51,3 +51,13 @@ NOTE: These entries may not contain every single minor change but should contain
 			loads the texture rectangle & background during creation and not during drawing.
 		* src/draw.c (drawGameOverText): uses the "label" structure now
 		* src/piece.c (mapKingPotentialMoves): optimized castling
+
+2021-02-03	version 00-0005
+	Created the move list, which currently doesn't do anything useful.
+	
+	source file changes
+		* created a new source file src/move_list.c
+		* str/move.c (movePiece): now adds to the list of moves after move
+
+	header file changes
+		* include/vgcp.h: added the move list structure, updated prototypes

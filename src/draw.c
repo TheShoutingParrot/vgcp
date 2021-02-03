@@ -186,5 +186,4 @@ SDL_Texture *renderText(char *textStr, SDL_Color textColor) {
         }
 
         return textTexture;
-
 }

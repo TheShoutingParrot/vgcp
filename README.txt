@@ -1,4 +1,5 @@
 Victor's Graphical Chess Program
+================================
 
 vgcp is a simple graphical chess UI which uses SDL2 and is written in C.
 

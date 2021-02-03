@@ -135,6 +135,10 @@ gameOverLoop:
 						SDL_Delay(100);
 
 						initBoard();
+						
+						removeMoveList();
+						initMoveList();
+
 						gameTurn = colorWhite;
 
 						goto mainGameLoop;
@@ -144,7 +148,7 @@ gameOverLoop:
 			}
 		}
 
-		SDL_Delay(100);
+		SDL_Delay(50);
 	}
 
 quitGame:
