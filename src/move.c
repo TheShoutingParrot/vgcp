@@ -143,6 +143,13 @@ void movePiece(struct move move) {
 		/* reset the status of the kings */
 		gameOver(noColor);
 	}
+
+	/* updates the half move clock (to enforce the 50-move rule) */
+	updateHalfmoveClock(move);
+	if(halfmoveClock >= 50) {
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "draw as a result of the 50-move rule");
+		gameOver(noColor);
+	}
 }
 
 void checkIfMated(color_t color, bool fromMove) {
@@ -217,9 +224,19 @@ void updateBoard(void) {
 
                                 case king:
                                         mapKingPotentialMoves(x, y, board[y][x].color ? underThreatByBlack : underThreatByWhite, false);
+
+					break;
                         }
 
                 }
 
         }
+}
+
+void updateHalfmoveClock(struct move move) {
+	if(move.piece == pawn
+			|| move.capture)
+		halfmoveClock = 0;
+	else
+		halfmoveClock++;
 }

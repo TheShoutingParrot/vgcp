@@ -161,8 +161,8 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 	uint8_t x, y;
 
 	/* if the clicked point is out of range then do nothing */
-	if(event.x < 0 || event.x > GAME_WINDOW_WIDTH
-			|| event.y < 0 || event.y > GAME_WINDOW_HEIGHT)
+	if(event.x < 0 || event.x > GAME_LOGICAL_WIDTH
+			|| event.y < 0 || event.y > GAME_LOGICAL_HEIGHT)
 		return;
 
 	x = event.x / 100;
@@ -176,6 +176,8 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 			&& board[y][x].color == gameTurn)
 		selectPiece(y, x);
 
+	/* this means that a piece is selected, if it's a potential move
+	 * then move there, if not then deselect the piece */
 	else if(selectedPiece.x != -1) {
 		if(board[y][x].tileState & potentialMove) {
 			struct move move;
@@ -185,6 +187,7 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 			move.from = selectedPiece;
 			move.color = board[move.from.y][move.from.x].color;
 			move.piece = board[move.from.y][move.from.x].piece;
+			move.capture = (board[move.to.y][move.to.x].piece != empty);
 
 			deselectPiece();
 			movePiece(move);

@@ -61,3 +61,14 @@ NOTE: These entries may not contain every single minor change but should contain
 
 	header file changes
 		* include/vgcp.h: added the move list structure, updated prototypes
+
+2021-02-05	version 00-0006
+	Added "capture" boolean to the move structure and added support for the 50-move rule (= added the halfmove clock)
+
+	source file changes
+		* src/move.c: created new function for updating the halfmove clock (updateHalfmoveClock)
+		* src/move.c (movePiece): now updates the halfmove clock after piece has moved 
+			and checks for a draw as a result of the 50-move rule.
+
+	header file changes
+		* include/vgcp.h: added the capture boolean to the move structure, updated prototypes

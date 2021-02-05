@@ -20,7 +20,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0005"
+#define PROGRAM_VERSION         "00-0006"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -127,6 +127,7 @@ struct move {
 		  	from;
 	color_t		color;
 	uint8_t		piece;
+	bool		capture;
 };
 
 struct moveList {
@@ -161,6 +162,8 @@ extern int8_t potentialKnight[4][2];
 
 struct moveList moves;
 
+uint8_t halfmoveClock;
+
 /* function prototypes (files can be all found in the "src/" directory) */
 
 /* main.c */
@@ -186,6 +189,7 @@ uint8_t countAllPotentialMoves(color_t color);
 void movePiece(struct move move);
 void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
+void updateHalfmoveClock(struct move move);
 
 /* move_list.c */
 void initMoveList(void);

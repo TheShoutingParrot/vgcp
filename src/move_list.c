@@ -46,10 +46,10 @@ void printMoveList(void) {
 	printf("number of entries %d and allocated %d\n", moves.n, moves.allocated);
 
 	for(i = 0; i < moves.n; i++) {
-		printf("entry %d:\t%d, %d -> %d %d color %s piece %d\n", i,
+		printf("entry %d:\t%d, %d -> %d %d color %s piece %d capture %d\n", i,
 				(moves.moves+i)->from.x, (moves.moves+i)->from.y,
 				(moves.moves+i)->to.x, (moves.moves+i)->to.y,
 				COLOR_INT_TO_STR((moves.moves+i)->color),
-				(moves.moves+i)->piece);
+				(moves.moves+i)->piece, (moves.moves+i)->capture);
 	}
 }
