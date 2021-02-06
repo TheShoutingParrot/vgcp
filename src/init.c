@@ -144,7 +144,7 @@ void initBoard(void) {
 
         for(y = 0; y < 8; y++) {
                 for(x = 0; x < 8; x++) {
-                        board[y][x] = unusedBoard[y][x];
+                        position.board[y][x] = unusedBoard[y][x];
                 }
         }
 }

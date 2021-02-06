@@ -63,7 +63,7 @@ NOTE: These entries may not contain every single minor change but should contain
 		* include/vgcp.h: added the move list structure, updated prototypes
 
 2021-02-05	version 00-0006
-	Added "capture" boolean to the move structure and added support for the 50-move rule (= added the halfmove clock)
+	Added "capture" boolean to the move structure and added support for the 50-move rule (= added the halfmove clock), fixed a bug (crashing on clicking off board)
 
 	source file changes
 		* src/move.c: created new function for updating the halfmove clock (updateHalfmoveClock)
@@ -72,3 +72,19 @@ NOTE: These entries may not contain every single minor change but should contain
 
 	header file changes
 		* include/vgcp.h: added the capture boolean to the move structure, updated prototypes
+
+2021-02-06	version 00-0007
+	Now stores the game state into the (new) position structure. The position structure stores the board, castling rights, the previous move and the player that will move next. This will be useful when checking for repitition (when storing a list of them).
+
+	source file changes
+		* created a new source file for updating and initializing the current position (src/position.c)
+		* almost all: Now uses the position structure.
+		* src/move.c: created a new function specifically to handle castling (castleKing),
+			created a new function specifically to handle adding a potential castling move
+			(addPotentialCastling)
+		* src/move.c (movePiece): no longer handles castling, 
+			now removes castling rights here if rook or king moves
+		* src/move.c: (addPotentialMove): no longer handles adding potential castling
+
+	header file changes:
+		* include/vgcp.h: created the position structure, updated prototypes

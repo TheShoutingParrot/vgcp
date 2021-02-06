@@ -20,7 +20,7 @@ void drawBoard(void) {
         SDL_RenderClear(gameRenderer);
 
 #ifndef _NO_PERSPECTIVE_CHANGE
-        if(gameTurn == colorWhite) {
+        if(position.playerToMove == colorWhite) {
                 for(y = 7; y > -1; y--) {
                         drawBoardRow(&tileColor, &tileRect, y);
                         tileColor = !tileColor;
@@ -48,7 +48,7 @@ void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y) {
         potentialMoveRect.h = 20;
 
         for(x = 0; x < 8; x++) {
-                if((BOARD_ROW(y, !gameTurn)) == selectedPiece.y &&
+                if((BOARD_ROW(y, !position.playerToMove)) == selectedPiece.y &&
                                 x == selectedPiece.x)
                         SDL_SetRenderDrawColor(gameRenderer, 0xf9, 0xf9, 0x00, 0xff);
                 else if(*color)
@@ -63,11 +63,15 @@ void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y) {
 
                 SDL_RenderFillRect(gameRenderer, tileRect);
 
-                if(board[BOARD_ROW(y, !gameTurn)][x].piece != empty) {
-                        SDL_RenderCopy(gameRenderer, pieceTexture[(board[BOARD_ROW(y, !gameTurn)][x].piece)][(board[BOARD_ROW(y, !gameTurn)][x].color)], NULL, tileRect);
+                if(position.board[BOARD_ROW(y, !position.playerToMove)][x].piece != empty) {
+                        SDL_RenderCopy(gameRenderer, 
+					pieceTexture[(position.board[BOARD_ROW(y, !position.playerToMove)][x].piece)][(position.board[BOARD_ROW(y, !position.playerToMove)][x].color)],
+					NULL, tileRect);
                 }
 
-                if((board[BOARD_ROW(y, !gameTurn)][x].tileState) & potentialMove) {
+                if((position.board[BOARD_ROW(y, !position.playerToMove)][x].tileState) & potentialMove
+				|| (position.board[BOARD_ROW(y, !position.playerToMove)][x].tileState) 
+					& potentialCastling) {
                         potentialMoveRect.x = tileRect->x + 40;
                         potentialMoveRect.y = tileRect->y + 40;
 
@@ -76,7 +80,7 @@ void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y) {
                 }
 
 #ifdef  _DEBUG
-                if((board[BOARD_ROW(y, !gameTurn)][x].tileState) & underThreatByWhite) {
+                if((position.board[BOARD_ROW(y, !position.playerToMove)][x].tileState) & underThreatByWhite) {
                         potentialMoveRect.x = tileRect->x + 10;
                         potentialMoveRect.y = tileRect->y + 10;
 
@@ -84,14 +88,13 @@ void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y) {
                         SDL_RenderFillRect(gameRenderer, &potentialMoveRect);
                 }
 
-		if((board[BOARD_ROW(y, !gameTurn)][x].tileState) & underThreatByBlack) {
+		if((position.board[BOARD_ROW(y, !position.playerToMove)][x].tileState) & underThreatByBlack) {
 			potentialMoveRect.x = tileRect->x + 70;
 			potentialMoveRect.y = tileRect->y + 10;
 
 			SDL_SetRenderDrawColor(gameRenderer, 0xff, 0x00, 0x00, 0xaa);
 			SDL_RenderFillRect(gameRenderer, &potentialMoveRect);
 		}
-
 #endif
 
 	}

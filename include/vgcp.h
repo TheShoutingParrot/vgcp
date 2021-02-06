@@ -20,7 +20,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0006"
+#define PROGRAM_VERSION         "00-0007"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -86,6 +86,7 @@ enum tileState {
         potentialMove           = 0x02,
         underThreatByWhite      = 0x04,
         underThreatByBlack      = 0x08,
+	potentialCastling	= 0x10,
 };
 
 enum userEvents {
@@ -126,14 +127,21 @@ struct move {
 	SDL_Point	to,
 		  	from;
 	color_t		color;
-	uint8_t		piece;
-	bool		capture;
+	uint8_t		piece,
+			capturedPiece;
 };
 
 struct moveList {
 	struct move	*moves;
-	uint16_t	n;
-	uint32_t	allocated;
+	uint16_t	n,
+			allocated;
+};
+
+struct position {
+	struct tile	board[8][8];
+	struct move	prevMove;
+	bool		castlingRights[2][2];
+	color_t		playerToMove;
 };
 
 /* variables */
@@ -143,12 +151,10 @@ SDL_Renderer    *gameRenderer;
 
 extern SDL_Point	selectedPiece,
 			kingLocation[2];
-color_t			gameTurn;
 extern bool		kingMated[2],
 			checkingIfCheckMated;
 
 extern struct tile unusedBoard[8][8];
-struct tile board[8][8];
 
 extern char *pieceName[empty];
 
@@ -163,6 +169,8 @@ extern int8_t potentialKnight[4][2];
 struct moveList moves;
 
 uint8_t halfmoveClock;
+
+struct position position;
 
 /* function prototypes (files can be all found in the "src/" directory) */
 
@@ -185,8 +193,10 @@ SDL_Texture *renderText(char *textStr, SDL_Color textColor);
 
 /* move.c */
 void addPotentialMove(uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX);
+void addPotentialCastling(color_t color, bool longCastle);
 uint8_t countAllPotentialMoves(color_t color);
 void movePiece(struct move move);
+void castleKing(color_t color, bool longCastle);
 void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
 void updateHalfmoveClock(struct move move);
@@ -207,6 +217,10 @@ void mapKnightPotentialMoves(uint8_t x, uint8_t y, uint8_t state);
 void mapBishopPotentialMoves(uint8_t x, uint8_t y, uint8_t state);
 void mapRookPotentialMoves(uint8_t x, uint8_t y, uint8_t state);
 void mapKingPotentialMoves(uint8_t x, uint8_t y, uint8_t state, bool fromMove);
+
+/* position.c */
+void updatePosition(struct move move);
+void initPosition(void);
 
 /* util.c */
 void cleanup(void);

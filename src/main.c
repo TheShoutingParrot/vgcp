@@ -33,13 +33,10 @@ int main(void) {
 
 	color_t gameWinner;
 
-
-	gameTurn = colorWhite;
-
 	if(init())
 		die("Initialization failed");
 
-	initBoard();
+	initPosition();
 
 	SDL_Event event;
 
@@ -134,12 +131,10 @@ gameOverLoop:
 
 						SDL_Delay(100);
 
-						initBoard();
-						
 						removeMoveList();
 						initMoveList();
 
-						gameTurn = colorWhite;
+						initPosition();
 
 						goto mainGameLoop;
 					}
@@ -166,32 +161,36 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 		return;
 
 	x = event.x / 100;
-	y = BOARD_ROW(event.y / 100, !gameTurn);
+	y = BOARD_ROW(event.y / 100, !position.playerToMove);
 
 	if(event.button != SDL_BUTTON_LEFT)
 		return;
 
-	if(board[y][x].piece != empty
+	if(position.board[y][x].piece != empty
 			&& selectedPiece.x == -1
-			&& board[y][x].color == gameTurn)
+			&& position.board[y][x].color == position.playerToMove)
 		selectPiece(y, x);
 
 	/* this means that a piece is selected, if it's a potential move
 	 * then move there, if not then deselect the piece */
 	else if(selectedPiece.x != -1) {
-		if(board[y][x].tileState & potentialMove) {
-			struct move move;
+		struct move move;
 
+		if(position.board[y][x].tileState & potentialMove) {
 			move.to.x = x;
 			move.to.y = y;
 			move.from = selectedPiece;
-			move.color = board[move.from.y][move.from.x].color;
-			move.piece = board[move.from.y][move.from.x].piece;
-			move.capture = (board[move.to.y][move.to.x].piece != empty);
+			move.color = position.board[move.from.y][move.from.x].color;
+			move.piece = position.board[move.from.y][move.from.x].piece;
+			move.capturedPiece = position.board[move.to.y][move.to.x].piece;
 
 			deselectPiece();
 			movePiece(move);
-			gameTurn = OPPOSITE_COLOR(gameTurn);
+		}
+		
+		else if(position.board[y][x].tileState & potentialCastling) {
+			deselectPiece();
+			castleKing(position.playerToMove, x == 2);
 		}
 
 		else

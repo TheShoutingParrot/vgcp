@@ -1,5 +1,5 @@
 CC		= gcc
-CFLAGS		= -I $(INC_DIR)
+CFLAGS		= -I $(INC_DIR) -g
 LIBS		= -lSDL2 -lSDL2_image -lSDL2_ttf
 
 INC_DIR 	= include
@@ -12,7 +12,7 @@ APPLICATIONS	= /usr/share/applications
 _DEPS		= vgcp.h
 DEPS		= $(patsubst %,$(INC_DIR)/%,$(_DEPS))
 
-_OBJ		= main.o init.o draw.o move.o move_list.o piece.o select.o util.o
+_OBJ		= main.o init.o draw.o move.o move_list.o piece.o position.o select.o util.o
 OBJ		= $(patsubst %,$(OBJ_DIR)/%,$(_OBJ))
 
 all: vgcp clean

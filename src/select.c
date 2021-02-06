@@ -8,7 +8,7 @@ void selectPiece(uint8_t y, uint8_t x) {
         selectedPiece.y = y;
 
         /* check for potential moves */
-        switch(board[y][x].piece) {
+        switch(position.board[y][x].piece) {
                 case pawn:
                         mapPawnPotentialMoves(x, y);
                         break;
@@ -47,8 +47,10 @@ void deselectPiece(void) {
 
         for(y = 0; y < 8; y++) {
                 for(x = 0; x < 8; x++) {
-                        if(board[y][x].tileState & potentialMove)
-                                board[y][x].tileState ^= potentialMove;
+                        if(position.board[y][x].tileState & potentialMove)
+                                position.board[y][x].tileState ^= potentialMove;
+                        if(position.board[y][x].tileState & potentialCastling)
+                                position.board[y][x].tileState ^= potentialCastling;
                 }
         }
 

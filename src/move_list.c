@@ -50,6 +50,6 @@ void printMoveList(void) {
 				(moves.moves+i)->from.x, (moves.moves+i)->from.y,
 				(moves.moves+i)->to.x, (moves.moves+i)->to.y,
 				COLOR_INT_TO_STR((moves.moves+i)->color),
-				(moves.moves+i)->piece, (moves.moves+i)->capture);
+				(moves.moves+i)->piece, (moves.moves+i)->capturedPiece);
 	}
 }
