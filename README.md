@@ -14,33 +14,39 @@ To compile this program, run ``` make ``` on the ``` vgcp/ ``` directory. To run
 
 To install this program, first edit the [include/config.h](include/config.h) file and uncomment the ``` _INSTALL ``` definition (``` #define _INSTALL ```). After doing this, simply run ``` sudo make install ``` which will install the program to ``` PREFIX/bin ``` (``` PREFIX ``` is defined in the makefile) and the assets to ``` PREFIX/share/vgcp/``` . Now you can use this program on any directory by typing ``` vgcp ``` on the command line or by finding it on your application menu.
 
-
 ## Features 
 
 Here's a list of currently supported features:
 
-  - All chess pieces moving correctly
+- All chess pieces moving correctly
 
     - Castling
 
-  - Player vs player gameplay
+- Player vs player gameplay
 
     - Checkmate and victory
 
-  - Draw (as a result of a stalemate)
+- Draw (as a result of a stalemate)
 
 
 Here's a list of features that will (hopefully) be implemented in the near future:
 
-  - En Passant
+- En Passant
 
-  - Draw as a result of repitition
+- Draw as a result of repitition
 
-  - Draw as a result of  not enough pieces (for checkmate)
+- Draw as a result of  not enough pieces (for checkmate)
 
-  - Support for some chess protocol
+- Support for some chess protocol
 
     - Player vs computer gameplay
+
+## Screenshots
+
+### 
+![Screenshot of vgcp on Ubuntu (GNOME), italian game](images/ss-ubuntu-opening-1.png)
+![Screenshot of vgcp on Ubuntu (GNOME), queen's gambit](images/ss-ubuntu-opening-2.png)
+![Screenshot of vgcp on Ubuntu (GNOME), fool's mate](images/ss-ubuntu-checkmate-1.png)
 
 ## Credits
 
