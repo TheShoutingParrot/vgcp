@@ -131,8 +131,8 @@ gameOverLoop:
 
 						SDL_Delay(100);
 
-						removeMoveList();
-						initMoveList();
+						removePositionList();
+						initPositionList();
 
 						initPosition();
 

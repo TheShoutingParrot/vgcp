@@ -35,7 +35,7 @@ bool init(void) {
                 return true;
         }
 
-	initMoveList();
+	initPositionList();
 
         return loadMedia();
 }

@@ -20,7 +20,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0007"
+#define PROGRAM_VERSION         "00-0008"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -131,17 +131,17 @@ struct move {
 			capturedPiece;
 };
 
-struct moveList {
-	struct move	*moves;
-	uint16_t	n,
-			allocated;
-};
-
 struct position {
 	struct tile	board[8][8];
 	struct move	prevMove;
 	bool		castlingRights[2][2];
 	color_t		playerToMove;
+};
+
+struct positionList {
+	struct position	*positions;
+	uint16_t	n,
+			allocated;
 };
 
 /* variables */
@@ -166,11 +166,10 @@ TTF_Font        *gameFont;
 
 extern int8_t potentialKnight[4][2];
 
-struct moveList moves;
-
 uint8_t halfmoveClock;
 
 struct position position;
+struct positionList positionList;
 
 /* function prototypes (files can be all found in the "src/" directory) */
 
@@ -201,12 +200,6 @@ void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
 void updateHalfmoveClock(struct move move);
 
-/* move_list.c */
-void initMoveList(void);
-void removeMoveList(void);
-void addToMoveList(struct move newMove);
-void printMoveList(void);
-
 /* select.c */
 void selectPiece(uint8_t y, uint8_t x);
 void deselectPiece(void);
@@ -221,6 +214,12 @@ void mapKingPotentialMoves(uint8_t x, uint8_t y, uint8_t state, bool fromMove);
 /* position.c */
 void updatePosition(struct move move);
 void initPosition(void);
+
+/* position_list.c */
+void initPositionList(void);
+void removePositionList(void);
+void addToPositionList(void);
+void printPositionList(void);
 
 /* util.c */
 void cleanup(void);

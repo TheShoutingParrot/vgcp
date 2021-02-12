@@ -120,12 +120,7 @@ void movePiece(struct move move) {
         position.board[move.to.y][move.to.x].pieceHasMoved = true;
         position.board[move.from.y][move.from.x].piece = empty;
 
-	addToMoveList(move);
 	updatePosition(move);
-
-#ifdef _DEBUG
-	printMoveList();
-#endif
 
 	switch(move.piece) {
         	/* when a pawn gets to the last row of the defense the pawn
@@ -188,6 +183,12 @@ void movePiece(struct move move) {
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "draw as a result of the 50-move rule");
 		gameOver(noColor);
 	}
+
+	addToPositionList();
+
+#ifdef _DEBUG
+	printPositionList();
+#endif
 }
 
 void castleKing(color_t color, bool longCastle) {
@@ -208,9 +209,6 @@ void castleKing(color_t color, bool longCastle) {
         position.board[move.to.y][move.to.x].color = move.color;
         position.board[move.to.y][move.to.x].pieceHasMoved = true;
         position.board[move.from.y][move.from.x].piece = empty;
-
-	addToMoveList(move);
-	updatePosition(move);
 
 #ifdef _DEBUG
 	printMoveList();
