@@ -1,8 +1,9 @@
 CC		= gcc
-CFLAGS		= -I $(INC_DIR) -g
+CFLAGS		= -I $(INC_DIR) -I $(SDL_INC_DIR) -g
 LIBS		= -lSDL2 -lSDL2_image -lSDL2_ttf
 
 INC_DIR 	= include
+SDL_INC_DIR	= /usr/include/SDL2
 SRC_DIR		= src
 OBJ_DIR 	= obj
 
@@ -18,6 +19,7 @@ OBJ		= $(patsubst %,$(OBJ_DIR)/%,$(_OBJ))
 all: vgcp clean
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
+	mkdir -p $(OBJ_DIR)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 vgcp: $(OBJ)
@@ -39,4 +41,4 @@ uninstall:
 	rm -f -r $(PREFIX)/share/vgcp
 	rm $(APPLICATIONS)/vgcp.desktop
 
-.PHONY: clean install uninstall
+.PHONY: create_obj_dir clean install uninstall
