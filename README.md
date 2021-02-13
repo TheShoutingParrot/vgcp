@@ -2,6 +2,8 @@
 
 vgcp is a simple graphical chess UI which uses SDL2 and is written in C.
 
+vgcp has been tested on Ubuntu, Void Linux and MacOS.
+
 ## Usage 
 
 If you wish to edit the software's (compilation) options then edit the definitions in [include/config.h](include/config.h).
@@ -43,11 +45,18 @@ Here's a list of features that will (hopefully) be implemented in the near futur
 
 ## Screenshots
 
-### 
+### vgcp on GNU/Linux
+
 ![Screenshot of vgcp on Ubuntu (GNOME), italian game](images/ss-ubuntu-opening-1.png)
 ![Screenshot of vgcp on Ubuntu (GNOME), queen's gambit](images/ss-ubuntu-opening-2.png)
 ![Screenshot of vgcp on Ubuntu (GNOME), fool's mate](images/ss-ubuntu-checkmate-1.png)
 
+### vgcp on MacOS
+
+![Screenshot of vgcp on MacOs](images/ss-macos.png)
+
 ## Credits
 
 The chess pieces were made by the Wikipedia user [Cburnett](https://en.wikipedia.org/wiki/User:Cburnett), see [assets/pieces/license.txt](assets/pieces/license.txt) for details. The [font](https://fontstruct.com/fontstructions/show/55273) that the game uses was made by Axel Leyer, see [assets/font/license.txt](assets/font/license.txt) and [assets/font/readme.txt](assets/font/readme.txt) for details.
+
+The program was tested on MacOS and the MacOS screenshots were provided by Github user [kaikkitietokoneista](https://github.com/kaikkitietokoneista)
