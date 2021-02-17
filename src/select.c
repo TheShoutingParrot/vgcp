@@ -51,6 +51,8 @@ void deselectPiece(void) {
                                 position.board[y][x].tileState ^= potentialMove;
                         if(position.board[y][x].tileState & potentialCastling)
                                 position.board[y][x].tileState ^= potentialCastling;
+                        if(position.board[y][x].tileState & potentialEnPassant)
+                                position.board[y][x].tileState ^= potentialEnPassant;
                 }
         }
 

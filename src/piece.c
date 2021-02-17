@@ -14,7 +14,6 @@ void mapPawnPotentialMoves(uint8_t x, uint8_t y) {
                         addPotentialMove(potential.y, x, y, x);
         }
 
-
         potential.y = y PLUS_OR_MINUS(position.board[y][x].color, 1);
         potential.x = x - 1;
 
@@ -25,6 +24,24 @@ void mapPawnPotentialMoves(uint8_t x, uint8_t y) {
 
         if(x != 7 && position.board[potential.y][potential.x].piece != empty && position.board[potential.y][potential.x].color != position.board[y][x].color)
                 addPotentialMove(potential.y, potential.x, y, x);
+
+
+	if(x != 7 && y == BOARD_ROW_PLAYER(4, position.board[y][x].color) && position.board[potential.y][potential.x].piece == empty &&
+			position.prevMove.from.y == BOARD_ROW_PLAYER(6, position.board[y][x].color) &&
+			position.prevMove.to.y == BOARD_ROW_PLAYER(4, position.board[y][x].color) &&
+			position.prevMove.from.x == potential.x && position.prevMove.piece == pawn)
+		addPotentialEnPassant(position.prevMove.to.y, position.prevMove.to.x,
+				potential.y, potential.x, y, x);
+
+        potential.x = x - 1;
+
+        if(x != 0 && y == BOARD_ROW_PLAYER(4, position.board[y][x].color) && position.board[potential.y][potential.x].piece == empty &&
+			position.prevMove.from.y == BOARD_ROW_PLAYER(6, position.board[y][x].color) &&
+			position.prevMove.to.y == BOARD_ROW_PLAYER(4, position.board[y][x].color) &&
+			position.prevMove.from.x == potential.x && position.prevMove.piece == pawn)
+		addPotentialEnPassant(position.prevMove.to.y, position.prevMove.to.x,
+				potential.y, potential.x, y, x);
+
 }
 
 void mapKnightPotentialMoves(uint8_t x, uint8_t y, uint8_t state) {

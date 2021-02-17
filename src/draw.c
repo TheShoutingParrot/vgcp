@@ -71,7 +71,9 @@ void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y) {
 
                 if((position.board[BOARD_ROW(y, !position.playerToMove)][x].tileState) & potentialMove
 				|| (position.board[BOARD_ROW(y, !position.playerToMove)][x].tileState) 
-					& potentialCastling) {
+					& potentialCastling
+				|| (position.board[BOARD_ROW(y, !position.playerToMove)][x].tileState) 
+					& potentialEnPassant) {
                         potentialMoveRect.x = tileRect->x + 40;
                         potentialMoveRect.y = tileRect->y + 40;
 

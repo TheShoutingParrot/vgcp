@@ -42,7 +42,7 @@ void addPotentialMove(uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX) {
         updateBoard();
 }
 
-/* marks the tile x, y as a potential castling move except if it results in
+/* marks a potential castling move except if it results in
  * a mating of the king */
 void addPotentialCastling(color_t color, bool longCastle) {
         struct tile originalTile;
@@ -80,6 +80,40 @@ void addPotentialCastling(color_t color, bool longCastle) {
 
         position.board[castle.y][castle.x].piece = originalTile.piece;
         position.board[castle.y][castle.x].color = originalTile.color;
+
+        updateBoard();
+}
+
+/* marks a potential "en passant" move */
+void addPotentialEnPassant(uint8_t capturedY, uint8_t capturedX, uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX) {
+	struct tile originalTile;
+	uint8_t movedPiece;
+
+	originalTile = position.board[y][x];
+
+	position.board[y][x].piece = position.board[pieceY][pieceX].piece;
+        position.board[y][x].color = position.board[pieceY][pieceX].color;
+
+	/* the captured pawn's tile becomes empty */
+	position.board[capturedY][capturedX].piece = empty;
+
+        movedPiece = position.board[pieceY][pieceX].piece;
+        position.board[pieceY][pieceX].piece = empty;
+
+        updateBoard();
+
+        checkIfMated(position.board[y][x].color, false);
+
+        if(!kingMated[position.board[y][x].color])
+                position.board[y][x].tileState |= potentialEnPassant;
+
+        position.board[pieceY][pieceX].piece = position.board[y][x].piece;
+        position.board[pieceY][pieceX].color = position.board[y][x].color;
+
+        position.board[y][x].piece = originalTile.piece;
+        position.board[y][x].color = originalTile.color;
+
+	position.board[capturedY][capturedX].piece = pawn;
 
         updateBoard();
 }
@@ -237,6 +271,49 @@ void castleKing(color_t color, bool longCastle) {
                 castlingMove.from.y = BOARD_ROW_PLAYER(0, move.color);
 		movePiece(castlingMove);
         }
+}
+
+/* special moving function to do "en passant" (which is a special pawn capture) */
+void enPassant(uint8_t capturedY, uint8_t capturedX, struct move move) {
+        position.board[move.to.y][move.to.x].piece = move.piece;
+        position.board[move.to.y][move.to.x].color = move.color;
+        position.board[move.to.y][move.to.x].pieceHasMoved = true;
+        position.board[move.from.y][move.from.x].piece = empty;
+
+	position.board[capturedY][capturedX].piece = empty;
+	position.board[capturedY][capturedX].color = noColor;
+
+	updatePosition(move);
+
+#ifndef _NO_PERSPECTIVE_CHANGE
+        SDL_Delay(250);
+#else
+        SDL_Delay(25);
+#endif
+
+	/* check if the king has been mated */
+        checkIfMated(position.playerToMove, true);
+
+	/* if the king is not mated but there are no potential moves for the
+	 * opposing player then it's a draw */
+	if((!kingMated[position.playerToMove]) 
+			&& (countAllPotentialMoves(position.playerToMove) == 0)) {
+		/* reset the status of the kings */
+		gameOver(noColor);
+	}
+
+	/* updates the half move clock (to enforce the 50-move rule) */
+	updateHalfmoveClock(move);
+	if(halfmoveClock >= 50) {
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "draw as a result of the 50-move rule");
+		gameOver(noColor);
+	}
+
+	addToPositionList();
+
+#ifdef _DEBUG
+	printPositionList();
+#endif
 }
 
 void checkIfMated(color_t color, bool fromMove) {

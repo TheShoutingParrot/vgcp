@@ -20,7 +20,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0008"
+#define PROGRAM_VERSION         "00-0009"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -87,6 +87,7 @@ enum tileState {
         underThreatByWhite      = 0x04,
         underThreatByBlack      = 0x08,
 	potentialCastling	= 0x10,
+	potentialEnPassant	= 0x20,
 };
 
 enum userEvents {
@@ -193,9 +194,11 @@ SDL_Texture *renderText(char *textStr, SDL_Color textColor);
 /* move.c */
 void addPotentialMove(uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX);
 void addPotentialCastling(color_t color, bool longCastle);
+void addPotentialEnPassant(uint8_t capturedY, uint8_t capturedX, uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX);
 uint8_t countAllPotentialMoves(color_t color);
 void movePiece(struct move move);
 void castleKing(color_t color, bool longCastle);
+void enPassant(uint8_t capturedY, uint8_t capturedX, struct move move);
 void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
 void updateHalfmoveClock(struct move move);

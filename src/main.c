@@ -193,6 +193,21 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 			castleKing(position.playerToMove, x == 2);
 		}
 
+		if(position.board[y][x].tileState & potentialEnPassant) {
+			int8_t temp;
+
+			move.to.x = x;
+			move.to.y = y;
+			move.from = selectedPiece;
+			move.color = position.board[move.from.y][move.from.x].color;
+			move.piece = position.board[move.from.y][move.from.x].piece;
+			move.capturedPiece = position.board[move.to.y][move.to.x].piece;
+	
+			temp = y - PLUS_OR_MINUS(position.board[selectedPiece.y][selectedPiece.x].color, 1);
+			deselectPiece();
+			enPassant(temp, x, move);
+		}
+
 		else
 			deselectPiece();
 	}
