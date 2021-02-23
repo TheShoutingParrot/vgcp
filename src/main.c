@@ -1,10 +1,13 @@
 #include <vgcp.h>
 
-SDL_Point	selectedPiece	= {-1, -1},
-		kingLocation[2] = {{4, 0}, {4, 7}};
+SDL_Window *gameWindow;
+SDL_Renderer *gameRenderer;
 
-bool		kingMated[2] = {false, false},
-                checkingIfCheckMated = false;
+SDL_Point selectedPiece	= {-1, -1},
+	  kingLocation[2] = {{4, 0}, {4, 7}};
+
+bool kingMated[2] = {false, false}, 
+     checkingIfCheckMated = false;
 
 struct tile unusedBoard[8][8] = {
         BOARD_FIRST_ROW(colorWhite),
@@ -19,7 +22,19 @@ struct tile unusedBoard[8][8] = {
 
 char *pieceName[empty] = {"pawn", "knight", "bishop", "rook", "queen", "king"};
 
+SDL_Texture *pieceTexture[empty][2];
+
+struct labels textTexture[4];
+struct button newGameButton;
+
+TTF_Font *gameFont;
+
 int8_t potentialKnight[4][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
+
+uint8_t halfmoveClock = 0;
+
+struct position position;
+struct positionList positionList;
 
 int main(void) {
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "version: "PROGRAM_VERSION);
@@ -43,8 +58,10 @@ int main(void) {
 mainGameLoop:
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "game begins");
 
-	updateWindow();
+	halfmoveClock = 0;
 	updateBoard();
+
+	updateWindow();
 
 	for(;;) {
 		while(SDL_PollEvent(&event)) {
@@ -201,7 +218,9 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 			move.from = selectedPiece;
 			move.color = position.board[move.from.y][move.from.x].color;
 			move.piece = position.board[move.from.y][move.from.x].piece;
-			move.capturedPiece = position.board[move.to.y][move.to.x].piece;
+
+			/* if en passant happends (which it is) then the captured piece is a pawn for sure */
+			move.capturedPiece = pawn; 
 	
 			temp = y - PLUS_OR_MINUS(position.board[selectedPiece.y][selectedPiece.x].color, 1);
 			deselectPiece();

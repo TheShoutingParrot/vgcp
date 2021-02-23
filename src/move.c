@@ -218,6 +218,11 @@ void movePiece(struct move move) {
 		gameOver(noColor);
 	}
 
+	if(checkForRepitition(3)) {
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "draw as a result of (threefold) repitition");
+		gameOver(noColor);
+	}
+
 	addToPositionList();
 
 #ifdef _DEBUG
@@ -244,10 +249,6 @@ void castleKing(color_t color, bool longCastle) {
         position.board[move.to.y][move.to.x].pieceHasMoved = true;
         position.board[move.from.y][move.from.x].piece = empty;
 
-#ifdef _DEBUG
-	printMoveList();
-#endif
-
 	struct move castlingMove;
 
         kingLocation[move.color].x = move.to.x;
@@ -256,6 +257,7 @@ void castleKing(color_t color, bool longCastle) {
         /* the king is castling so we must also move the rook */
 	castlingMove.piece = rook;
 	castlingMove.color = move.color;
+	castlingMove.capturedPiece = empty;
 
         if(!longCastle) {
 		castlingMove.to.x = 5;

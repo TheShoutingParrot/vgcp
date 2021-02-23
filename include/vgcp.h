@@ -20,7 +20,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0009"
+#define PROGRAM_VERSION         "00-000A"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -75,7 +75,7 @@ enum pieces {
         pawn,
         knight,
         bishop,
-        rook ,
+        rook,
         queen,
         king,
         empty,
@@ -147,30 +147,32 @@ struct positionList {
 
 /* variables */
 
-SDL_Window      *gameWindow;
-SDL_Renderer    *gameRenderer;
+extern SDL_Window		*gameWindow;
+extern SDL_Renderer		*gameRenderer;
 
-extern SDL_Point	selectedPiece,
-			kingLocation[2];
-extern bool		kingMated[2],
-			checkingIfCheckMated;
+extern SDL_Point		selectedPiece,
+				kingLocation[2];
 
-extern struct tile unusedBoard[8][8];
+extern bool			kingMated[2],
+				checkingIfCheckMated;
 
-extern char *pieceName[empty];
+extern struct tile 		unusedBoard[8][8];
 
-SDL_Texture     *pieceTexture[empty][2];
-struct labels	textTexture[4];
-struct button   newGameButton; 
+extern char 			*pieceName[empty];
 
-TTF_Font        *gameFont;
+extern SDL_Texture		*pieceTexture[empty][2];
 
-extern int8_t potentialKnight[4][2];
+extern struct labels		textTexture[4];
+extern struct button		newGameButton;
 
-uint8_t halfmoveClock;
+extern TTF_Font			*gameFont;
 
-struct position position;
-struct positionList positionList;
+extern int8_t			potentialKnight[4][2];
+
+extern uint8_t			halfmoveClock;
+
+extern struct position		position;
+extern struct positionList	positionList;
 
 /* function prototypes (files can be all found in the "src/" directory) */
 
@@ -223,6 +225,7 @@ void initPositionList(void);
 void removePositionList(void);
 void addToPositionList(void);
 void printPositionList(void);
+bool checkForRepitition(uint8_t n);
 
 /* util.c */
 void cleanup(void);

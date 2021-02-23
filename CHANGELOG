@@ -110,3 +110,15 @@ NOTE: These entries may not contain every single minor change but should contain
 
 	header file changes
 		* include/vgcp: added "potentialEnPassant" to the tileState enum, updated prototypes 
+
+2021-02-23	version 00-000A
+	Implemented threefold repitition. If the same position repeats thrice then the game results in a draw. The implementation isn't perfect because (for example) it doesn't take into account the "En Passant" rights when counting repetitions. Also, fixed a compilation error related to variable definitions in the header files and some other bugs.
+
+	source file changes
+		* src/main.c: now defines variables here
+		* src/move.c (movePiece): now calls the "checkForRepitition" function to check for threefold repitition
+		* src/positionList: created new function for checking repitition (checkForRepitition) and created related static functions (compareBoards, compareCastlingRights) 
+		* src/positionList (addToPositionList): optimized memory usage (wipes the list clean if an irreversible move occurs)
+
+	header file changes
+		* include/vgcp: now all variable definitions are "extern"s
