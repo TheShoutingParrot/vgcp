@@ -200,3 +200,31 @@ longCastle:
 endKingMoveMapping:
         return;
 }
+
+/* this function checks if there's enough pieces for either side to get a checkmate */
+bool checkIfEnoughPieces(void) {
+	/* what is considered insufficent material:
+	 * 	- lone king (total pieces = 0)
+	 * 	- king and bishop 
+	 * 	- king and knight */
+#ifdef DEBUG
+	printf("%d %d %d %d %d\n", (position.piecesArray[king] == 0),
+			(position.piecesArray[king] == 2 && position.piecesArray[bishop] == 2),
+			(position.piecesArray[king] == 1 && position.piecesArray[bishop] == 1),
+			(position.piecesArray[king] == 2 && position.piecesArray[knight] == 2),
+			(position.piecesArray[king] == 1 && position.piecesArray[knight] == 1),
+			(position.piecesArray[king] == 2 && position.piecesArray[bishop] == 1
+				&& position.piecesArray[knight] == 1));
+#endif /* #ifdef DEBUG */
+
+	if((position.piecesArray[king] == 0)
+			|| (position.piecesArray[king] == 2 && position.piecesArray[bishop] == 2)
+			|| (position.piecesArray[king] == 1 && position.piecesArray[bishop] == 1)
+			|| (position.piecesArray[king] == 2 && position.piecesArray[knight] == 2)
+			|| (position.piecesArray[king] == 1 && position.piecesArray[knight] == 1)
+			|| (position.piecesArray[king] == 2 && position.piecesArray[bishop] == 1
+				&& position.piecesArray[knight] == 1))
+		return false;
+
+	return true;
+}

@@ -3,6 +3,7 @@
 
 #include <config.h>
 
+/* warnings */
 #ifdef  _DEBUG
 #warning "DEBUG OPTION IS ON!!"
 #endif
@@ -10,6 +11,8 @@
 #ifndef _NO_PERSPECTIVE_CHANGE
 #warning "_NO_PERSPECTIVE_CHANGE option is off! Currently not working properly!!! Please turn it back on (if you aren't debugging / fixing the issue)"
 #endif
+
+#warning "This version may have some odd bugs... if so please report them to this email address: theshoutingparrot@protonmail.com"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -20,7 +23,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-000A"
+#define PROGRAM_VERSION         "00-000B"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -136,6 +139,7 @@ struct position {
 	struct tile	board[8][8];
 	struct move	prevMove;
 	bool		castlingRights[2][2];
+	uint8_t		piecesArray[empty]; /* here we store the amount of pieces */
 	color_t		playerToMove;
 };
 
@@ -215,6 +219,7 @@ void mapKnightPotentialMoves(uint8_t x, uint8_t y, uint8_t state);
 void mapBishopPotentialMoves(uint8_t x, uint8_t y, uint8_t state);
 void mapRookPotentialMoves(uint8_t x, uint8_t y, uint8_t state);
 void mapKingPotentialMoves(uint8_t x, uint8_t y, uint8_t state, bool fromMove);
+bool checkIfEnoughPieces(void);
 
 /* position.c */
 void updatePosition(struct move move);

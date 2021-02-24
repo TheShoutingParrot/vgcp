@@ -122,3 +122,18 @@ NOTE: These entries may not contain every single minor change but should contain
 
 	header file changes
 		* include/vgcp: now all variable definitions are "extern"s
+
+2021-02-24	version	00-000B
+	WARNING: I have noticed some odd checkmate related bugs in this version.
+		 Please create an issue on github or contact me on email (theshoutingparrot@protonmail.com)
+	Implemented draw as a result of insufficent material and now correctly checks repitition.
+
+	source file changes
+		* src/piece: created new function for checking if there aren't enough pieces for a checkmate (checkIfEnoughPieces)
+		* src/move.c (movePiece): now calls the checkIfEnoughPieces to check for enough pieces
+		* src/position.c (updatePosition): now updates the amount of pieces (piecesArray)
+		* src/position_list.c (checkForRepitition): corrected repitition checking
+
+	header file changes
+		* include/vgcp: added warning about unstability of this program (for now),
+			added an array of pieces (piecesArray) which stores the amount of different pieces on the board

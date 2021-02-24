@@ -169,6 +169,11 @@ void movePiece(struct move move) {
 			) {
         		        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "a pawn has been promoted");
                 		position.board[move.to.y][move.to.x].piece = queen; /* TODO: menu to choose which piece */
+
+				/* because a pawn has been promoted we need to remove one pawn from the pieces array
+				 * and add one queen */
+				position.piecesArray[pawn]--;
+				position.piecesArray[queen]++;
 	        	}
 
 			break;
@@ -220,6 +225,11 @@ void movePiece(struct move move) {
 
 	if(checkForRepitition(3)) {
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "draw as a result of (threefold) repitition");
+		gameOver(noColor);
+	}
+	
+	if(!checkIfEnoughPieces()) {
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "draw as a result of insufficent material");
 		gameOver(noColor);
 	}
 

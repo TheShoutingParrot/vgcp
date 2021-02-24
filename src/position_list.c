@@ -80,7 +80,7 @@ bool checkForRepitition(uint8_t n) {
 	for(i = 0; i < positionList.n; i++) {
 		if(compareBoards((struct tile *)&(positionList.positions[i].board), (struct tile *)&(position.board))) {
 			repitition++;
-			if(repitition >= n)
+			if(repitition >= (n - 1))
 				return true;
 		}
 	}
