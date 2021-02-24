@@ -137,3 +137,12 @@ NOTE: These entries may not contain every single minor change but should contain
 	header file changes
 		* include/vgcp: added warning about unstability of this program (for now),
 			added an array of pieces (piecesArray) which stores the amount of different pieces on the board
+
+2021-02-24	version	00-000C
+	Changed default size of window to 800x800 and merged src/position.c and src/position_list.c
+
+	source file changes
+		* src/position.c: merged file with position_list.c
+
+	header file changes
+		* include/vgcp.h: changed default window size definitions, slightly changed wording of warnings

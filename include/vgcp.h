@@ -5,11 +5,11 @@
 
 /* warnings */
 #ifdef  _DEBUG
-#warning "DEBUG OPTION IS ON!!"
+#warning "DEBUG OPTION IS ON!"
 #endif
 
 #ifndef _NO_PERSPECTIVE_CHANGE
-#warning "_NO_PERSPECTIVE_CHANGE option is off! Currently not working properly!!! Please turn it back on (if you aren't debugging / fixing the issue)"
+#warning "_NO_PERSPECTIVE_CHANGE option is off! May not work properly."
 #endif
 
 #warning "This version may have some odd bugs... if so please report them to this email address: theshoutingparrot@protonmail.com"
@@ -23,13 +23,13 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-000B"
+#define PROGRAM_VERSION         "00-000C"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
 #define GAME_LOGICAL_HEIGHT     800
-#define GAME_WINDOW_WIDTH       1000
-#define GAME_WINDOW_HEIGHT      1000
+#define GAME_WINDOW_WIDTH       800
+#define GAME_WINDOW_HEIGHT      800
 
 #define BOARD_FIRST_ROW(c)      {{rook, c, normalState, false}, {knight, c, normalState, false}, {bishop, c, normalState, false}, {queen, c, normalState, false}, {king, c, normalState, false}, {bishop, c, normalState, false}, {knight, c, normalState, false}, {rook, c, normalState, false}}
 #define BOARD_SECOND_ROW(c)     {{pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}, {pawn, c, normalState, false}}
@@ -224,8 +224,6 @@ bool checkIfEnoughPieces(void);
 /* position.c */
 void updatePosition(struct move move);
 void initPosition(void);
-
-/* position_list.c */
 void initPositionList(void);
 void removePositionList(void);
 void addToPositionList(void);
