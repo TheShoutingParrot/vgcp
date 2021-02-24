@@ -1,5 +1,7 @@
 # Victor's Graphical Chess Program
 
+**CURRENTLY (as of version 00-000B) there is some odd behaviour related to checkmates, for a better chess experience (without some new features) use an earlier version, such as version 00-000A!**
+
 vgcp is a simple graphical chess UI which uses SDL2 and is written in C.
 
 vgcp has been tested on Ubuntu, Void Linux and MacOS.
@@ -24,20 +26,22 @@ Here's a list of currently supported features:
 
     - Castling
 
+    - En Passant
+
 - Player vs player gameplay
 
     - Checkmate and victory
 
-- Draw (as a result of a stalemate)
+- Draw as a result of...
+
+    - a stalemate
+
+    - insufficent material 
+
+    - threefold repitition
 
 
 Here's a list of features that will (hopefully) be implemented in the near future:
-
-- En Passant
-
-- Draw as a result of repitition
-
-- Draw as a result of  not enough pieces (for checkmate)
 
 - Support for some chess protocol
 
