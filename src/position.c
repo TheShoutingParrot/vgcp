@@ -34,6 +34,10 @@ void initPosition(void) {
 	for(i = 0; i < empty; i++)
 		position.piecesArray[i] = startingPieces[i];
 
+	position.kingLocation[colorWhite].x = 4;
+	position.kingLocation[colorBlack].x = 4;
+	position.kingLocation[colorWhite].y = 0;
+	position.kingLocation[colorBlack].y = 7;
 
 	addToPositionList();
 }

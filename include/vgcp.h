@@ -12,8 +12,6 @@
 #warning "_NO_PERSPECTIVE_CHANGE option is off! May not work properly."
 #endif
 
-#warning "This version may have some odd bugs... if so please report them to this email address: theshoutingparrot@protonmail.com"
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -23,7 +21,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-000C"
+#define PROGRAM_VERSION         "00-000D"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -139,6 +137,7 @@ struct position {
 	struct tile	board[8][8];
 	struct move	prevMove;
 	bool		castlingRights[2][2];
+	SDL_Point	kingLocation[noColor];
 	uint8_t		piecesArray[empty]; /* here we store the amount of pieces */
 	color_t		playerToMove;
 };
@@ -154,8 +153,7 @@ struct positionList {
 extern SDL_Window		*gameWindow;
 extern SDL_Renderer		*gameRenderer;
 
-extern SDL_Point		selectedPiece,
-				kingLocation[2];
+extern SDL_Point		selectedPiece;
 
 extern bool			kingMated[2],
 				checkingIfCheckMated;
@@ -171,7 +169,7 @@ extern struct button		newGameButton;
 
 extern TTF_Font			*gameFont;
 
-extern int8_t			potentialKnight[4][2];
+extern const int8_t		potentialKnight[4][2];
 
 extern uint8_t			halfmoveClock;
 

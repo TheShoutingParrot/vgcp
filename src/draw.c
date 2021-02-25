@@ -63,6 +63,17 @@ void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y) {
 
                 SDL_RenderFillRect(gameRenderer, tileRect);
 
+#ifdef _DEBUG
+		if(y == BOARD_ROW(position.kingLocation[0].y, !position.playerMove) && x == position.kingLocation[0].x) {
+			SDL_SetRenderDrawColor(gameRenderer, 0x00, 0xff, 0x00, 0x00);
+                	SDL_RenderFillRect(gameRenderer, tileRect);
+		}
+		else if(y == BOARD_ROW(position.kingLocation[1].y, !position.playerToMove) && x == position.kingLocation[1].x) {
+			SDL_SetRenderDrawColor(gameRenderer, 0xff, 0x00, 0x00, 0x00);
+                	SDL_RenderFillRect(gameRenderer, tileRect);
+		}
+#endif
+
                 if(position.board[BOARD_ROW(y, !position.playerToMove)][x].piece != empty) {
                         SDL_RenderCopy(gameRenderer, 
 					pieceTexture[(position.board[BOARD_ROW(y, !position.playerToMove)][x].piece)][(position.board[BOARD_ROW(y, !position.playerToMove)][x].color)],

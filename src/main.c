@@ -3,8 +3,7 @@
 SDL_Window *gameWindow;
 SDL_Renderer *gameRenderer;
 
-SDL_Point selectedPiece	= {-1, -1},
-	  kingLocation[2] = {{4, 0}, {4, 7}};
+SDL_Point selectedPiece	= {-1, -1};
 
 bool kingMated[2] = {false, false}, 
      checkingIfCheckMated = false;
@@ -29,7 +28,7 @@ struct button newGameButton;
 
 TTF_Font *gameFont;
 
-int8_t potentialKnight[4][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
+const int8_t potentialKnight[4][2] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
 
 uint8_t halfmoveClock = 0;
 

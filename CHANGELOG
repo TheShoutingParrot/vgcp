@@ -139,6 +139,7 @@ NOTE: These entries may not contain every single minor change but should contain
 			added an array of pieces (piecesArray) which stores the amount of different pieces on the board
 
 2021-02-24	version	00-000C
+	WARNING: The previous warning (on version 00-000B) also applies to this version.
 	Changed default size of window to 800x800 and merged src/position.c and src/position_list.c
 
 	source file changes
@@ -146,3 +147,18 @@ NOTE: These entries may not contain every single minor change but should contain
 
 	header file changes
 		* include/vgcp.h: changed default window size definitions, slightly changed wording of warnings
+
+	Edit 2021-02-25: added warning
+
+2021-02-25	version	00-000D
+	GOOD NEWS: The checkmate related bug has been fixed.
+	Fixed the odd checkmate related bug (stalemates resulting in checkmates for example), moved the kingLocation variable to the position structure, fixed other errors.
+
+	source file changes
+		* src/position.c (initPosition): moved kingLocation initializing here
+		* src/move.c (movePiece): fixed kingLocation not being properly set
+		* src/draw.c (drawBoardRow): now the tile that the king is in (according to king location)
+			is red.
+		* src/piece.c (mapKingPotentialMoves): fixed a bug allowing players to castle 
+			even after castling rights have been lost if the other player still has castling
+			rights.

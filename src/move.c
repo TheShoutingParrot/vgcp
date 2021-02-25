@@ -17,13 +17,13 @@ void addPotentialMove(uint8_t y, uint8_t x, uint8_t pieceY, uint8_t pieceX) {
         updateBoard();
 
         if(movedPiece == king) {
-                kingLocation[position.board[y][x].color].x = x;
-                kingLocation[position.board[y][x].color].y = y;
+                position.kingLocation[position.board[y][x].color].x = x;
+                position.kingLocation[position.board[y][x].color].y = y;
 
                 checkIfMated(position.board[y][x].color, false);
 
-                kingLocation[position.board[y][x].color].x = pieceX;
-                kingLocation[position.board[y][x].color].y = pieceY;
+                position.kingLocation[position.board[y][x].color].x = pieceX;
+                position.kingLocation[position.board[y][x].color].y = pieceY;
         }
 
         else {
@@ -64,13 +64,13 @@ void addPotentialCastling(color_t color, bool longCastle) {
 
         updateBoard();
 
-        kingLocation[color].x = castle.x;
-        kingLocation[color].y = castle.y;
+        position.kingLocation[color].x = castle.x;
+        position.kingLocation[color].y = castle.y;
 
         checkIfMated(position.board[castle.y][castle.x].color, false);
 
-        kingLocation[color].x = king.x;
-        kingLocation[color].y = king.y;
+        position.kingLocation[color].x = king.x;
+        position.kingLocation[color].y = king.y;
 
         if(!kingMated[position.board[castle.y][castle.x].color])
                 position.board[castle.y][castle.x].tileState |= potentialCastling;
@@ -196,6 +196,9 @@ void movePiece(struct move move) {
 			position.castlingRights[move.color][0] = false;
 			position.castlingRights[move.color][1] = false;
 
+			position.kingLocation[move.color].x = move.to.x;
+			position.kingLocation[move.color].y = move.to.y;
+
 			break;
 	}
 
@@ -218,6 +221,7 @@ void movePiece(struct move move) {
 
 	/* updates the half move clock (to enforce the 50-move rule) */
 	updateHalfmoveClock(move);
+	/* checks if the halfmove clock is at 50 (if so the game results in a draw) */
 	if(halfmoveClock >= 50) {
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "draw as a result of the 50-move rule");
 		gameOver(noColor);
@@ -251,6 +255,9 @@ void castleKing(color_t color, bool longCastle) {
 	move.color = color;
 	move.capturedPiece = empty;
 
+        position.kingLocation[move.color].x = move.to.x;
+        position.kingLocation[move.color].y = move.to.y;
+
 	position.castlingRights[move.color][0] = false;
 	position.castlingRights[move.color][1] = false;
 
@@ -260,9 +267,6 @@ void castleKing(color_t color, bool longCastle) {
         position.board[move.from.y][move.from.x].piece = empty;
 
 	struct move castlingMove;
-
-        kingLocation[move.color].x = move.to.x;
-        kingLocation[move.color].y = move.to.y;
 
         /* the king is castling so we must also move the rook */
 	castlingMove.piece = rook;
@@ -330,8 +334,8 @@ void enPassant(uint8_t capturedY, uint8_t capturedX, struct move move) {
 
 void checkIfMated(color_t color, bool fromMove) {
         updateBoard();
-
-        if(position.board[kingLocation[color].y][kingLocation[color].x].tileState & (color ? underThreatByWhite: underThreatByBlack)) {
+	
+        if(position.board[position.kingLocation[color].y][position.kingLocation[color].x].tileState & (color ? underThreatByWhite: underThreatByBlack)) {
                 kingMated[color] = true;
 
                 if(color && fromMove)

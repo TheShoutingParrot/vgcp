@@ -163,9 +163,11 @@ void mapKingPotentialMoves(uint8_t x, uint8_t y, uint8_t state, bool fromMove) {
         }
 
         /* castling */
-	if(((position.castlingRights[colorWhite][1]
+	if(((position.playerToMove == colorWhite 
+				&& position.castlingRights[colorWhite][1]
 				&& !(position.board[y][x].tileState & underThreatByBlack))
-			|| (position.castlingRights[colorBlack][1]
+			|| (position.playerToMove == colorBlack
+				&& position.castlingRights[colorBlack][1]
 				&& !(position.board[y][x].tileState & underThreatByWhite)))
 			&& fromMove) {
                 potential.y = position.board[y][x].color ? 7 : 0;
@@ -180,9 +182,11 @@ void mapKingPotentialMoves(uint8_t x, uint8_t y, uint8_t state, bool fromMove) {
 	}
         /* long castling */
 longCastle:
-	if(((position.castlingRights[colorWhite][0]
+	if(((position.playerToMove == colorWhite
+				&& position.castlingRights[colorWhite][0]
 				&& !(position.board[y][x].tileState & underThreatByBlack))
-			|| (position.castlingRights[colorBlack][0]
+			|| (position.playerToMove == colorBlack
+				&& position.castlingRights[colorBlack][0]
 				&& !(position.board[y][x].tileState & underThreatByWhite)))
 			&& fromMove) {
 
@@ -196,7 +200,7 @@ longCastle:
 
 		addPotentialCastling(position.board[y][x].color, true);
         }
-
+	
 endKingMoveMapping:
         return;
 }
