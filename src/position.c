@@ -3,6 +3,7 @@
 static void allocateMoreToList(void);
 static bool compareBoards(struct tile *board1, struct tile *board2);
 static bool compareCastlingRights(bool *castlingRights1, bool *castlingRights2);
+static bool compareEnPassantRights(bool *enPassantRights1, bool *enPassantRights2);
 
 void initPosition(void) {
         uint8_t i, j;
@@ -33,6 +34,11 @@ void initPosition(void) {
 
 	for(i = 0; i < empty; i++)
 		position.piecesArray[i] = startingPieces[i];
+
+	for(i = 0; i < 8; i++) {
+		position.enPassantRights[colorWhite][i] = false;
+		position.enPassantRights[colorBlack][i] = false;
+	}
 
 	position.kingLocation[colorWhite].x = 4;
 	position.kingLocation[colorBlack].x = 4;
@@ -115,6 +121,24 @@ void addToPositionList(void) {
 		}
 	}
 
+#ifdef _DEBUG
+	printf("EN PASSANT RIGHTS:");
+#endif
+	for(x = 0; x < 8; x++) {
+                        positionList.positions[positionList.n].enPassantRights[0][x] =
+                                position.enPassantRights[0][x];
+                        positionList.positions[positionList.n].enPassantRights[1][x] =
+                                position.enPassantRights[1][x];
+
+#ifdef _DEBUG
+                        printf(" W: %d B: %d", positionList.positions[positionList.n].enPassantRights[0][x], 
+					positionList.positions[positionList.n].enPassantRights[1][x]);
+#endif
+        }
+#ifdef _DEBUG
+        putchar('\n');
+#endif
+
 	positionList.positions[positionList.n].prevMove = position.prevMove;
 
 	positionList.n += 1;
@@ -126,7 +150,9 @@ bool checkForRepitition(uint8_t n) {
 	repitition = 0;
 
 	for(i = 0; i < positionList.n; i++) {
-		if(compareBoards((struct tile *)&(positionList.positions[i].board), (struct tile *)&(position.board))) {
+		if(compareBoards((struct tile *)&(positionList.positions[i].board), (struct tile *)&(position.board))
+				&& compareEnPassantRights((bool *)&(positionList.positions[i].enPassantRights),
+					(bool *)&(position.enPassantRights))) {
 			repitition++;
 			if(repitition >= (n - 1))
 				return true;
@@ -160,6 +186,17 @@ static bool compareCastlingRights(bool *castlingRights1, bool *castlingRights2) 
 
 	for(i = 0; i < 4; i++) {
 		if(*(castlingRights1+i) != *(castlingRights2+i))
+			return false;
+	}
+
+	return true;
+}
+
+static bool compareEnPassantRights(bool *enPassantRights1, bool *enPassantRights2) {
+	uint8_t i;
+
+	for(i = 0; i < 16; i++) {
+		if(*(enPassantRights1+i) != *(enPassantRights2+i))
 			return false;
 	}
 

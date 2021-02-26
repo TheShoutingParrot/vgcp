@@ -21,7 +21,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-000D"
+#define PROGRAM_VERSION         "00-000E"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -136,7 +136,8 @@ struct move {
 struct position {
 	struct tile	board[8][8];
 	struct move	prevMove;
-	bool		castlingRights[2][2];
+	bool		castlingRights[2][2],
+			enPassantRights[2][8];
 	SDL_Point	kingLocation[noColor];
 	uint8_t		piecesArray[empty]; /* here we store the amount of pieces */
 	color_t		playerToMove;

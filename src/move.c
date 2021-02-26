@@ -176,6 +176,13 @@ void movePiece(struct move move) {
 				position.piecesArray[queen]++;
 	        	}
 
+			else if(move.to.y == (move.color ? 4 : 3)
+					&& move.from.y == ((move.color ? 6 : 1))
+					&& ((position.board[move.to.y][move.to.x+1].piece == pawn)
+						|| (position.board[move.to.y][move.to.x-1].piece == pawn))) {
+				position.enPassantRights[move.color][move.to.x] = true;
+			}
+
 			break;
 
 		/* if a rook moves from it's original position then it's side
@@ -242,6 +249,8 @@ void movePiece(struct move move) {
 #ifdef _DEBUG
 	printPositionList();
 #endif
+
+	position.enPassantRights[move.color][move.to.x] = false;
 }
 
 void castleKing(color_t color, bool longCastle) {

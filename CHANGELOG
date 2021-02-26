@@ -162,3 +162,14 @@ NOTE: These entries may not contain every single minor change but should contain
 		* src/piece.c (mapKingPotentialMoves): fixed a bug allowing players to castle 
 			even after castling rights have been lost if the other player still has castling
 			rights.
+
+2021-02-26	version 00-000E
+	Now the repitition checks for en passant rights also (very untested at the moment)
+
+	source file changes
+		* src/position.c (initPosition): initializes en passant rights
+		* src/position.c (checkForRepitition): now checks if en passant rights repeat
+		* src/move.c (movePiece): now updates en passant rights when a pawn is moved
+	
+	header file changes
+		* include/vgcp.h: added the enPassantRights array to the position structure
