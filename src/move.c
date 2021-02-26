@@ -160,13 +160,7 @@ void movePiece(struct move move) {
         	/* when a pawn gets to the last row of the defense the pawn
 	         * becomes a queen, rook, bishop or knight */
 		case pawn:
-	        	if(
-#ifndef _NO_PERSPECTIVE_CHANGE
-				move.to.y == BOARD_ROW(7, position.board[move.to.y][move.to.x].color)
-#else
-				move.to.y == (position.board[move.to.y][move.to.x].color ? 0 : 7)
-#endif
-			) {
+	        	if(move.to.y == (position.board[move.to.y][move.to.x].color ? 0 : 7)) {
         		        SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "a pawn has been promoted");
                 		position.board[move.to.y][move.to.x].piece = queen; /* TODO: menu to choose which piece */
 
@@ -208,12 +202,6 @@ void movePiece(struct move move) {
 
 			break;
 	}
-
-#ifndef _NO_PERSPECTIVE_CHANGE
-        SDL_Delay(250);
-#else
-        SDL_Delay(25);
-#endif
 
 	/* check if the king has been mated */
         checkIfMated(position.playerToMove, true);

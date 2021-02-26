@@ -41,9 +41,6 @@ int main(void) {
 #ifdef _DEBUG
 	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "debug option is on! You've been warned!");
 #endif
-#ifndef _NO_PERSPECTIVE_CHANGE
-	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "_NO_PERSPECTIVE_CHANGE option is off! The program may not work properly as a result of this.");
-#endif
 
 	color_t gameWinner;
 
@@ -91,7 +88,6 @@ mainGameLoop:
 	}
 
 gameOverLoop:
-
 	updateWindow();
 	SDL_Delay(250);
 
@@ -145,8 +141,6 @@ gameOverLoop:
 						drawGameOverText(gameWinner);
 						SDL_RenderPresent(gameRenderer);
 
-						SDL_Delay(100);
-
 						removePositionList();
 						initPositionList();
 
@@ -159,7 +153,7 @@ gameOverLoop:
 			}
 		}
 
-		SDL_Delay(50);
+		SDL_Delay(100);
 	}
 
 quitGame:

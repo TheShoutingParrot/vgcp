@@ -8,10 +8,6 @@
 #warning "DEBUG OPTION IS ON!"
 #endif
 
-#ifndef _NO_PERSPECTIVE_CHANGE
-#warning "_NO_PERSPECTIVE_CHANGE option is off! May not work properly."
-#endif
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -21,7 +17,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-000E"
+#define PROGRAM_VERSION         "00-000F"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -35,11 +31,7 @@
 
 #define BOARD_ROW_REVERSE(y)    (7 - y)
 
-#ifndef _NO_PERSPECTIVE_CHANGE
-#define BOARD_ROW(y, r)         (r ? BOARD_ROW_REVERSE(y) : y)
-#else
 #define BOARD_ROW(y, r)         (BOARD_ROW_REVERSE(y))
-#endif
 
 #define BOARD_ROW_PLAYER(y, r)	(r ? BOARD_ROW_REVERSE(y) : y)
 

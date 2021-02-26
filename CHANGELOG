@@ -164,7 +164,7 @@ NOTE: These entries may not contain every single minor change but should contain
 			rights.
 
 2021-02-26	version 00-000E
-	Now the repitition checks for en passant rights also (very untested at the moment)
+	Now the program repitition checker checks for en passant rights also (very untested at the moment)
 
 	source file changes
 		* src/position.c (initPosition): initializes en passant rights
@@ -173,3 +173,14 @@ NOTE: These entries may not contain every single minor change but should contain
 	
 	header file changes
 		* include/vgcp.h: added the enPassantRights array to the position structure
+
+	EDIT 2021-02-26: fixed sentence
+
+2021-02-26	version 00-000F
+	Removed the _NO_PERSPECTIVE_CHANGE option and removed support for changing perspective, removed unnecessary delays
+
+	source file changes
+		* src/draw.c (drawBoard): removed support for changing perspective
+
+	header file changes
+		* include/config.h: removed the _NO_PERSPECTIVE_CHANGE option

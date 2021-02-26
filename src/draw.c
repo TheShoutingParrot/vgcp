@@ -19,25 +19,10 @@ void drawBoard(void) {
         SDL_SetRenderDrawColor(gameRenderer, 0x00, 0x00, 0x00, 0xff);
         SDL_RenderClear(gameRenderer);
 
-#ifndef _NO_PERSPECTIVE_CHANGE
-        if(position.playerToMove == colorWhite) {
-                for(y = 7; y > -1; y--) {
-                        drawBoardRow(&tileColor, &tileRect, y);
-                        tileColor = !tileColor;
-                }
-        }
-        else {
-                for(y = 0; y < 8; y++) {
-                        drawBoardRow(&tileColor, &tileRect, y);
-                        tileColor = !tileColor;
-                }
-        }
-#else
         for(y = 7; y > -1; y--) {
                 drawBoardRow(&tileColor, &tileRect, y);
                 tileColor = !tileColor;
         }
-#endif
 }
 
 void drawBoardRow(bool *color, SDL_Rect *tileRect, uint8_t y) {
