@@ -10,40 +10,30 @@ If you wish to edit the software's (compilation) options then edit the definitio
 
 ### Without Installation
 
-To compile this program, run ``` make ``` on the ``` vgcp/ ``` directory. To run the program simply run ``` ./vgcp ```.
+To compile this program, run `make` on the `vgcp/` directory. To run the program simply run `./vgcp`.
 
 ### Installation
 
-To install this program, first edit the [include/config.h](include/config.h) file and uncomment the ``` _INSTALL ``` definition (``` #define _INSTALL ```). After doing this, simply run ``` sudo make install ``` which will install the program to ``` PREFIX/bin ``` (``` PREFIX ``` is defined in the makefile) and the assets to ``` PREFIX/share/vgcp/``` . Now you can use this program on any directory by typing ``` vgcp ``` on the command line or by finding it on your application menu.
+To install this program, first edit the [include/config.h](include/config.h) file and uncomment the `_INSTALL` definition (`#define _INSTALL`). After doing this, simply run `sudo make install` which will install the program to `PREFIX/bin` (`PREFIX` is defined in the makefile) and the assets to `PREFIX/share/vgcp/` . Now you can use this program on any directory by typing `vgcp` on the command line or by finding it on your application menu.
 
 ## Features 
 
 Here's a list of currently supported features:
 
 - All chess pieces moving correctly
-
-    - Castling
-
-    - En Passant
-
+  - Castling
+  - En Passant
 - Player vs player gameplay
-
-    - Checkmate and victory
-
+  - Checkmate and victory
 - Draw as a result of...
-
-    - a stalemate
-
-    - insufficent material 
-
-    - threefold repitition
-
+  - a stalemate
+  - insufficent material 
+  - threefold repitition
 
 Here's a list of features that will (hopefully) be implemented in the near future:
 
 - Support for some chess protocol
-
-    - Player vs computer gameplay
+  - Player vs computer gameplay
 
 ## Screenshots
 

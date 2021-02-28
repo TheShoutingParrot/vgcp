@@ -41,4 +41,4 @@ uninstall:
 	rm -f -r $(PREFIX)/share/vgcp
 	rm $(APPLICATIONS)/vgcp.desktop
 
-.PHONY: create_obj_dir clean install uninstall
+.PHONY: clean install uninstall
