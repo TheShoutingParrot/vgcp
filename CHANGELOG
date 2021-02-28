@@ -184,3 +184,14 @@ NOTE: These entries may not contain every single minor change but should contain
 
 	header file changes
 		* include/config.h: removed the _NO_PERSPECTIVE_CHANGE option
+
+2021-02-28	version 00-0010
+	Implemented command-line arguments: -v (for version) and -h (for help)
+
+	source file changes
+		* src/main.c (main): added command-line argument parsing,
+			removed version printing at the start of execution
+		* src/util.c: added two new functions: usage and help
+
+	header file changes
+		* include/vgcp.h: updated prototypes

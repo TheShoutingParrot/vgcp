@@ -35,8 +35,32 @@ uint8_t halfmoveClock = 0;
 struct position position;
 struct positionList positionList;
 
-int main(void) {
-	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "version: "PROGRAM_VERSION);
+int main(int argv, char *argc[]) {
+	/* parses the command line arguments */
+	while(argv > 1) {
+		if(*argc[argv-1] == '-') {
+			if(strlen(argc[argv-1]) == 2) {
+				switch(*(argc[argv-1]+1)) {
+					case 'v':
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "version: "PROGRAM_VERSION);
+						return EXIT_SUCCESS;
+					case 'h':
+						help(argc[0]);
+					default:
+						usage(argc[0]);
+				}
+			}
+
+			else {
+				usage(argc[0]);
+			}
+		}
+		else {
+			usage(argc[0]);
+		}
+
+		argv--;
+	}
 
 #ifdef _DEBUG
 	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "debug option is on! You've been warned!");

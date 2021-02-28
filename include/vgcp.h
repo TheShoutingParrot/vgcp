@@ -17,7 +17,7 @@
 #include <stdbool.h>
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-000F"
+#define PROGRAM_VERSION         "00-0010"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -223,6 +223,8 @@ bool checkForRepitition(uint8_t n);
 
 /* util.c */
 void cleanup(void);
+void usage(const char *name);
+void help(const char *name);
 void die(char *fmt, ...);
 
 #endif /* #ifndef __VGCP_H */
