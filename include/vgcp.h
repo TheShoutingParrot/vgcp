@@ -4,20 +4,37 @@
 #include <config.h>
 
 /* warnings */
+
 #ifdef  _DEBUG
 #warning "DEBUG OPTION IS ON!"
 #endif
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+/* header files */
+
+/* standard libraries */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <unistd.h>
+#include <string.h>
+
+/* libraries for graphics */
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+
+/* libraries for socket communication */
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+/* misc libraries */
+#include <SDL2/SDL_thread.h>
+
+/* definitions */
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0010"
+#define PROGRAM_VERSION         "00-0011"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -83,9 +100,11 @@ enum tileState {
 	potentialEnPassant	= 0x20,
 };
 
-enum userEvents {
+typedef enum userEvents {
         GAMEOVER_EVENT,
-};
+	MOVED_EVENT,
+} userEvents_t;
+
 
 enum buttonStates {
         normal,
@@ -94,7 +113,29 @@ enum buttonStates {
         allButtonStates,
 };
 
-/* structs */
+typedef enum msgTypes {
+	/* all of these are moves */
+	MSG_MOVE,
+	MSG_MOVE_AND_END, /* this is here just to simplify messaging */
+	MSG_CASTLING_MOVE,
+	MSG_ENPASSANT_MOVE,
+	/* ---------------------- */
+
+	MSG_INFO,
+	MSG_ROGER,
+	MSG_QUITTING,
+	MSG_GAME_ENDS,
+	MSG_NEW_GAME,
+	MSG_UNKNOWN,
+} msgType_t;
+
+typedef enum serverStates {
+	standby,
+	waitingForBlack,
+	waitingForWhite,
+} serverState_t; 
+
+/* structs (and unions) */
 
 struct tile {
         uint8_t         piece;
@@ -141,6 +182,44 @@ struct positionList {
 			allocated;
 };
 
+struct server {
+	uint16_t port;
+
+	struct sockaddr_in address;
+
+	int		serverfd,
+			socket,
+			valread,
+			opt;
+
+	serverState_t	state;
+
+	char 		in[30],
+			out[30];
+};
+
+/* this is only used as a msgDataType */
+struct lastMove {
+	struct move	move;
+	color_t 	winner; /* important to know if it's a draw */
+};
+
+union msgDataTypes {
+	struct move 	move;
+	struct lastMove	lastMove;
+	color_t		winner,
+			playerColor;
+	char 		other[30];
+};
+
+struct msg {
+	bool 			empty;
+	color_t			to;		/* this tells us who the message is to (which color player or if it's to the 
+						 * server. noColor = to the server or (if from server) to all */
+	msgType_t		type;
+	union msgDataTypes 	data;
+};
+
 /* variables */
 
 extern SDL_Window		*gameWindow;
@@ -168,6 +247,18 @@ extern uint8_t			halfmoveClock;
 
 extern struct position		position;
 extern struct positionList	positionList;
+
+extern struct server		gameServer;
+
+extern SDL_Thread 		*blackThreadID;
+
+extern SDL_sem			*serverDataLock;
+extern SDL_sem			*msgDataLock;
+
+extern bool			blackOnPort;
+
+extern struct msg		msgBlack;
+extern struct msg		msgServer;
 
 /* function prototypes (files can be all found in the "src/" directory) */
 
@@ -199,6 +290,7 @@ void enPassant(uint8_t capturedY, uint8_t capturedX, struct move move);
 void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
 void updateHalfmoveClock(struct move move);
+void pushMoveEvent(color_t color);
 
 /* select.c */
 void selectPiece(uint8_t y, uint8_t x);
@@ -226,5 +318,12 @@ void cleanup(void);
 void usage(const char *name);
 void help(const char *name);
 void die(char *fmt, ...);
+
+/* connection.c */
+bool connectToBlack(void);
+struct move convertPlayerMsgToMove(const char *msg);
+void closeSocket(int socket);
+int connectionHandlingThread(void *data);
+void createBlackThread(void);
 
 #endif /* #ifndef __VGCP_H */

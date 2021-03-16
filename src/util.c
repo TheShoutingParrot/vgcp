@@ -1,6 +1,8 @@
 #include <vgcp.h>
 
 void cleanup(void) {
+	closeSocket(gameServer.socket);
+
         SDL_DestroyRenderer(gameRenderer);
         SDL_DestroyWindow(gameWindow);
 

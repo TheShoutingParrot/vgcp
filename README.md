@@ -1,5 +1,7 @@
 # Victor's Graphical Chess Program
 
+WARNING: This version's (00-0011) new features haven't been tested well and this version may have unexpected bugs.
+
 vgcp is a simple graphical chess UI which uses SDL2 and is written in C. 
 
 vgcp has been tested on Ubuntu, Void Linux, Arch Linux and MacOS.
@@ -29,11 +31,11 @@ Here's a list of currently supported features:
   - a stalemate
   - insufficent material 
   - threefold repitition
+- Support for some chess protocol (**untested at the moment**)
 
 Here's a list of features that will (hopefully) be implemented in the near future:
 
-- Support for some chess protocol
-  - Player vs computer gameplay
+- Player vs computer gameplay
 
 ## Screenshots
 

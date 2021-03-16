@@ -238,7 +238,12 @@ void movePiece(struct move move) {
 	printPositionList();
 #endif
 
+	/* removes the en passant rights, just in case en passant was possible
+	 * on this turn */
 	position.enPassantRights[move.color][move.to.x] = false;
+
+	/* pushes the "MOVED_EVENT" on to the event queue (is it even a queue?) */
+	pushMoveEvent(move.color);
 }
 
 void castleKing(color_t color, bool longCastle) {
@@ -415,4 +420,23 @@ void updateHalfmoveClock(struct move move) {
 		halfmoveClock = 0;
 	else
 		halfmoveClock++;
+}
+
+void pushMoveEvent(color_t color) {
+	SDL_Event moveEvent;
+	color_t *colorPtr;
+	userEvents_t *typePtr;
+
+	colorPtr = (color_t *)malloc(sizeof(color_t));
+	typePtr = (userEvents_t *)malloc(sizeof(userEvents_t));
+
+	*colorPtr = color;
+	*typePtr = MOVED_EVENT;
+
+	moveEvent.type = SDL_USEREVENT;
+	
+	moveEvent.user.data1 = colorPtr;
+	moveEvent.user.data2 = typePtr;
+
+	SDL_PushEvent(&moveEvent);
 }

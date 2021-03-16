@@ -35,31 +35,58 @@ uint8_t halfmoveClock = 0;
 struct position position;
 struct positionList positionList;
 
-int main(int argv, char *argc[]) {
+struct server gameServer;
+
+SDL_Thread *blackThreadID;
+
+SDL_sem *serverDataLock;
+SDL_sem *msgDataLock;
+
+bool blackOnPort = false;
+
+struct msg msgBlack;
+struct msg msgServer;
+
+int main(int argc, char *args[]) {
+	uint8_t i;
+
 	/* parses the command line arguments */
-	while(argv > 1) {
-		if(*argc[argv-1] == '-') {
-			if(strlen(argc[argv-1]) == 2) {
-				switch(*(argc[argv-1]+1)) {
+	for(i = 1; i < argc; i++) { 
+		if(*args[i] == '-') {
+			if(strlen(args[i]) == 2) {
+				switch(*(args[i]+1)) {
 					case 'v':
 						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "version: "PROGRAM_VERSION);
 						return EXIT_SUCCESS;
 					case 'h':
-						help(argc[0]);
+						help(args[0]);
+					case 'b':
+						if((i+1) >= argc)
+							usage(args[0]);
+						
+						gameServer.port = atoi(args[++i]);
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "port %d will play as black\n", gameServer.port);
+						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "This feature (other programs controlling a player) hasn't been tested well at all, please don't use this if you aren't debugging!");
+
+						/* if the connection failed then die */
+						if(!connectToBlack())
+							die("Connection between the GUI and the player failed");
+
+						createBlackThread();
+						
+						break;
 					default:
-						usage(argc[0]);
+						usage(args[0]);
 				}
 			}
 
 			else {
-				usage(argc[0]);
+				usage(args[0]);
 			}
 		}
 		else {
-			usage(argc[0]);
+			usage(args[0]);
 		}
-
-		argv--;
 	}
 
 #ifdef _DEBUG
@@ -74,6 +101,9 @@ int main(int argv, char *argc[]) {
 	initPosition();
 
 	SDL_Event event;
+
+	msgBlack.empty = true;
+	msgServer.empty = true;
 
 mainGameLoop:
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "game begins");
@@ -101,24 +131,92 @@ mainGameLoop:
 					break;
 
 				case SDL_USEREVENT:
-					gameWinner = *((color_t *)event.user.data1);
-					goto gameOverLoop;
+					updateWindow();
+
+					switch(*((userEvents_t *)event.user.data2)) {
+						case GAMEOVER_EVENT:
+							gameWinner = *((color_t *)event.user.data1);
+
+							free(event.user.data1);
+							free(event.user.data2);
+
+							if(blackOnPort) {
+								SDL_SemWait(msgDataLock);
+								if(position.playerToMove == colorBlack) {
+									msgServer.empty = false;
+									msgServer.type = MSG_MOVE_AND_END;
+									msgServer.data.lastMove.move = position.prevMove;
+									msgServer.data.lastMove.winner = gameWinner;
+								}
+								else {
+									msgServer.empty = false;
+									msgServer.type = MSG_GAME_ENDS;
+									msgServer.data.winner = gameWinner;
+								}
+								SDL_SemPost(msgDataLock);
+							}
+
+							goto gameOverLoop;
+
+						case MOVED_EVENT:
+							if(blackOnPort) {
+								SDL_SemWait(msgDataLock);
+
+								msgServer.empty = false;
+
+								if(*((color_t *)event.user.data1) == colorWhite) {
+									msgServer.to = colorBlack;
+									msgServer.type = MSG_MOVE;
+									msgServer.data.move = position.prevMove;
+								}
+
+								else {
+									msgServer.to = colorBlack;
+									msgServer.type = MSG_ROGER; /* we want to tell the client that we recieved this move and it worked */
+								}
+
+								SDL_SemPost(msgDataLock);
+							}
+							break;
+
+						default:
+							SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown custom event received!");
+					}
+							
+					free(event.user.data1);
+					free(event.user.data2);
 
 					break;
 			}
 		}
 
-		SDL_Delay(100);
+		if(blackOnPort && !msgBlack.empty && msgBlack.to == noColor) {
+			printf("type %d %d\n", msgBlack.type, MSG_MOVE);
+
+			switch(msgBlack.type) {
+				case MSG_MOVE:
+					printf("%d, %d -> %d, %d\n", msgBlack.data.move.from.x, msgBlack.data.move.from.y,
+							msgBlack.data.move.to.x, msgBlack.data.move.to.y);
+					movePiece(msgBlack.data.move);
+					break;
+				default:
+					SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown type of message sent to the main thread!");
+					break;
+			}
+
+			msgBlack.empty = true; /* now that we handled this we can label the black message as trash */
+		}
+
+		SDL_Delay(50);
 	}
 
 gameOverLoop:
 	updateWindow();
-	SDL_Delay(250);
+
+	SDL_Delay(50);
 
 	drawGameOverText(gameWinner);
 	SDL_RenderPresent(gameRenderer);
-
-	SDL_Delay(250);
 
 	newGameButton.state = normal;
 
@@ -170,6 +268,18 @@ gameOverLoop:
 
 						initPosition();
 
+						if(blackOnPort) {
+							SDL_SemWait(serverDataLock);
+
+							msgServer.empty = false;
+							msgServer.type = MSG_NEW_GAME;
+							msgServer.data.playerColor = colorBlack;
+
+							puts("Hello there! Thiz goo!");
+
+							SDL_SemPost(serverDataLock);
+						}
+
 						goto mainGameLoop;
 					}
 
@@ -182,6 +292,18 @@ gameOverLoop:
 
 quitGame:
 	cleanup();
+
+	if(blackOnPort) {
+		SDL_SemWait(msgDataLock);
+
+		msgServer.empty = false;
+		msgServer.type = MSG_QUITTING;
+
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting for the thread to finish...");
+		SDL_Delay(100);
+
+		SDL_WaitThread(blackThreadID, NULL);
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -202,8 +324,11 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 
 	if(position.board[y][x].piece != empty
 			&& selectedPiece.x == -1
-			&& position.board[y][x].color == position.playerToMove)
-		selectPiece(y, x);
+			&& position.board[y][x].color == position.playerToMove) {
+		if(position.playerToMove == colorBlack	&& blackOnPort == true);
+		else
+			selectPiece(y, x);
+	}
 
 	/* this means that a piece is selected, if it's a potential move
 	 * then move there, if not then deselect the piece */
@@ -253,21 +378,25 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 
 void gameOver(color_t winner) {
 	SDL_Event winEvent;
+	userEvents_t *typePtr;
 	color_t *winnerPtr;
-
-	winnerPtr = (color_t *)malloc(sizeof(color_t));
 
 	if(winner == noColor)
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "the match results in a draw\n");
 	else
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "%s checkmated, %s wins\n",
 			COLOR_INT_TO_STR(!winner), COLOR_INT_TO_STR(winner));
-	*winnerPtr = winner;
 
-	winEvent.user.type = GAMEOVER_EVENT;
-	winEvent.user.data1 = winnerPtr;
-	
+	winnerPtr = (color_t *)malloc(sizeof(color_t));
+	typePtr = (userEvents_t *)malloc(sizeof(userEvents_t));
+
+	*winnerPtr = winner;
+	*typePtr = GAMEOVER_EVENT;
+
 	winEvent.type = SDL_USEREVENT;
+
+	winEvent.user.data1 = winnerPtr;
+	winEvent.user.data2 = typePtr;
 
 	SDL_PushEvent(&winEvent);
 }
