@@ -37,6 +37,8 @@ Here's a list of features that will (hopefully) be implemented in the near futur
 
 - Player vs computer gameplay
 
+For a more detailed version of features that should/will be implemented in the near future see the [TODO.md](TODO.md) file.
+
 ## Screenshots
 
 ### vgcp on GNU/Linux
