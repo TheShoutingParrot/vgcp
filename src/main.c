@@ -69,8 +69,11 @@ int main(int argc, char *args[]) {
 						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "This feature (other programs controlling a player) hasn't been tested well at all, please don't use this if you aren't debugging!");
 
 						/* if the connection failed then die */
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting for black to connect");
 						if(!connectToBlack())
 							die("Connection between the GUI and the player failed");
+
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "black connected succesfully");
 
 						createBlackThread();
 						
@@ -298,6 +301,8 @@ quitGame:
 
 		msgServer.empty = false;
 		msgServer.type = MSG_QUITTING;
+
+		SDL_SemPost(msgDataLock);
 
 		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting for the thread to finish...");
 		SDL_Delay(100);

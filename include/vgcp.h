@@ -30,11 +30,13 @@
 
 /* misc libraries */
 #include <SDL2/SDL_thread.h>
+#include <errno.h>
+#include <fcntl.h>
 
 /* definitions */
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0011"
+#define PROGRAM_VERSION         "00-0012"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800

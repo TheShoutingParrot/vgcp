@@ -1,5 +1,9 @@
 #include <vgcp.h>
 
+#ifdef _SOCKET_DEBUG
+#warning "socket debugging mode on... you will receive more and possibly more verbose socket related logs"
+#endif
+
 bool connectToBlack(void) {
 	gameServer.opt = 1;
 
@@ -53,6 +57,11 @@ bool connectToBlack(void) {
 
 	if(strcmp(gameServer.in, "r\n")) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "client didn't respond correctly");
+		return false;
+	}
+
+	if(fcntl(gameServer.socket, F_SETFL, (fcntl(gameServer.socket, F_GETFL, 0) | O_NONBLOCK), 0) < 0) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "couldn't set the socket to be non blocking");
 		return false;
 	}
 
@@ -115,8 +124,6 @@ static void blackQuits(void) {
 struct move convertPlayerMsgToMove(const char *msg) {
 	struct move move;
 
-	printf("msg %s\n", msg);
-
 	move.from.x = (*(msg+2) - 'a');
 	move.from.y = (*(msg+3) - '1');
 
@@ -170,9 +177,7 @@ char *convertMsgToString(struct msg msg) {
 
 			break;
 
-		case MSG_NEW_GAME:
-			puts("NEW GAYME");
-
+		case MSG_NEW_GAME: /* TODO: This looks very odd and bad (looks like there's variation in behavior between converting different messages) */
 			SDL_SemWait(serverDataLock);
 
 			if(msgServer.data.playerColor == colorWhite)
@@ -186,6 +191,11 @@ char *convertMsgToString(struct msg msg) {
 
 			SDL_SemPost(msgDataLock);
 			SDL_SemPost(serverDataLock);
+
+			break;
+
+		case MSG_QUITTING:
+			strcpy(msgStr, "q\n");
 
 			break;
 
@@ -233,8 +243,6 @@ struct msg convertStringToMsg(char *str) {
 
 static void waitForReceivingMsg(void) {
 	for(;;) {
-		printf("waiting...\n");
-
 		SDL_SemWait(msgDataLock);
 		if(!msgServer.empty) {
 			switch(msgServer.type) {
@@ -277,6 +285,12 @@ static void waitForReceivingMsg(void) {
 				case MSG_QUITTING:
 					SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unexpected quit message, quitting...");
 
+					strcpy(gameServer.out, convertMsgToString(msgServer));
+					send(gameServer.socket, gameServer.out, strlen(gameServer.out), 30);
+
+					SDL_SemPost(msgDataLock);
+					SDL_SemPost(serverDataLock);
+
 					blackQuits();
 
 				default:
@@ -292,55 +306,124 @@ static void waitForReceivingMsg(void) {
 	}
 }
 
-int connectionHandlingThread(void *data) {
+static void waitForRoger(uint8_t stateIfRoger) {
+	int r, err;
+	
+#ifdef _SOCKET_DEBUG
+	puts("wait for roger");
+#endif
+
 	for(;;) {
+		r = read(gameServer.socket, gameServer.in, 30);
+		err = errno; /* we save errno for it can change before we need it */
+
+		if(r < 0) {
+			if(err == EAGAIN || err == EWOULDBLOCK)
+#ifdef _SOCKET_DEBUG
+				puts("would block");
+#else
+				continue;
+#endif
+			else
+				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "reading socket failed");
+		}
+
+		else {
+			switch(gameServer.in[0]) {
+				case 'r':
+					if(msgServer.type ==  MSG_MOVE_AND_END || msgServer.type ==  MSG_GAME_ENDS) {
+						gameServer.state = standby;
+					}
+					else
+						gameServer.state = stateIfRoger;
+
+					SDL_SemPost(msgDataLock);
+					SDL_SemPost(serverDataLock);
+		
+					goto end_wait_for_roger;
+
+				default:
+						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown response to message!");
+				case 'q':
+						blackQuits();
+			}
+		}
+
+		SDL_SemPost(msgDataLock);
+		SDL_SemPost(serverDataLock);
+
+		SDL_Delay(50);
+
+		SDL_SemWait(msgDataLock);
+		SDL_SemWait(serverDataLock);
+
+		if(!msgServer.empty && msgServer.type == MSG_QUITTING) {
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "quitting command received from main thread!");
+
+			strcpy(gameServer.out, convertMsgToString(msgServer));
+
+#ifdef _SOCKET_DEBUG 
+			printf("sending quit command to client: %s\n", gameServer.out);
+#endif
+
+			send(gameServer.socket, gameServer.out, strlen(gameServer.out), 30);
+
+			msgServer.empty = true;
+
+			SDL_SemPost(msgDataLock);
+			SDL_SemPost(serverDataLock);
+
+			goto end_wait_for_roger;
+		}
+
+	}
+
+end_wait_for_roger:
+	return;
+}
+
+int connectionHandlingThread(void *data) {
+	int r, err;
+
+	for(;;) {
+#ifdef _SOCKET_DEBUG
+		puts("sLoop...");
+#endif
+
 		SDL_SemWait(serverDataLock);
 		SDL_SemWait(msgDataLock);
 
 		switch(gameServer.state) {
 			case waitingForWhite:
-				if(msgServer.to == colorBlack && msgServer.empty == false) {
+				if(msgServer.to == colorBlack && msgServer.empty == false && msgServer.type != MSG_QUITTING) {
 					strcpy(gameServer.out, convertMsgToString(msgServer));
 
 					msgServer.empty = true;
 		
-					printf("msg: %s\n", gameServer.out); 
-		
 					send(gameServer.socket, gameServer.out, strlen(gameServer.out), 30);
-
-					read(gameServer.socket, gameServer.in, 30);
-
-					switch(gameServer.in[0]) {
-						case 'r':
-							if(msgServer.type ==  MSG_MOVE_AND_END || msgServer.type ==  MSG_GAME_ENDS) {
-								gameServer.state = standby;
-							}
-							else
-								gameServer.state = waitingForBlack;
-
-							SDL_SemPost(msgDataLock);
-							SDL_SemPost(serverDataLock);
-		
-							break;
-
-						default:
-							SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown response to message!");
-						case 'q':
-							blackQuits();
-					}
+					waitForRoger(waitingForBlack);
 				}
 
 				break;
 
 			case waitingForBlack:
-				SDL_SemWait(serverDataLock);
-
-				SDL_SemWait(msgDataLock);
-
 				msgServer.empty = true;
 		
-				read(gameServer.socket, gameServer.in, 30);
-				printf("in: %s\n", gameServer.in); 
+				r = read(gameServer.socket, gameServer.in, 30);
+				err = errno;
+
+				if(r < 0) {
+					if(err == EAGAIN || err == EWOULDBLOCK)
+#ifdef _SOCKET_DEBUG
+						puts("would block (fyi waiting fo black)");
+#else
+						continue;
+#endif /* #ifdef _SOCKET_DEBUG */
+					else
+						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "reading socket failed");
+
+					break;
+				}
 
 				msgBlack = convertStringToMsg(gameServer.in);
 
@@ -365,27 +448,7 @@ int connectionHandlingThread(void *data) {
 				if(msgServer.type == MSG_GAME_ENDS) {
 					gameServer.state = standby;
 
-					read(gameServer.socket, gameServer.in, 30);
-
-					switch(gameServer.in[0]) {
-						case 'r':
-
-							if(msgServer.type ==  MSG_MOVE_AND_END || msgServer.type ==  MSG_GAME_ENDS) {
-								gameServer.state = standby;
-							}
-							else
-								gameServer.state = waitingForBlack;
-
-							SDL_SemPost(msgDataLock);
-							SDL_SemPost(serverDataLock);
-		
-							break;
-
-						default:
-							SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown response to message!");
-						case 'q':
-							blackQuits();
-					}
+					waitForRoger(standby);	
 				}
 				else {
 					gameServer.state = waitingForWhite;
@@ -400,32 +463,13 @@ int connectionHandlingThread(void *data) {
 
 			case standby: /* this waits for the next game to start */
 				SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "the connection thread is on standby!");
-				if(!msgServer.empty) {
+				if(!msgServer.empty && msgServer.type != MSG_QUITTING) {
 					strcpy(gameServer.out, convertMsgToString(msgServer));
 msgServer.empty = true;
 		
-					printf("msg: %s\n", gameServer.out); 
-		
 					send(gameServer.socket, gameServer.out, strlen(gameServer.out), 30);
 
-					read(gameServer.socket, gameServer.in, 30);
-
-					printf("reading..... %s\n", gameServer.in);
-
-					switch(gameServer.in[0]) {
-						case 'r':
-							SDL_SemPost(msgDataLock);
-							SDL_SemPost(serverDataLock);
-
-							gameServer.state = waitingForWhite;
-
-							break;
-
-						default:
-							SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown response to message!");
-						case 'q':
-							blackQuits();
-					}
+					waitForRoger(waitingForWhite);
 				}
 
 				break;
@@ -435,13 +479,27 @@ msgServer.empty = true;
 				break;
 		}
 
+		if(!msgServer.empty && msgServer.type == MSG_QUITTING) {
+			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "quitting command received from main thread!");
+
+			strcpy(gameServer.out, convertMsgToString(msgServer));
+			send(gameServer.socket, gameServer.out, strlen(gameServer.out), 30);
+
+			msgServer.empty = true;
+
+#ifdef _SOCKET_DEBUG 
+			printf("sending quit command to client: %s and len %d\n", gameServer.out, strlen(gameServer.out));
+#endif
+			break;
+		}
+
 		SDL_SemPost(msgDataLock);
 
 		SDL_SemPost(serverDataLock);
 
 		SDL_Delay(500);
-
 	}
+
 
 	blackQuits();
 }

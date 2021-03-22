@@ -212,3 +212,14 @@ NOTE: These entries may not contain every single minor change but should contain
 
 	PS: if you were wondering about why this hasn't been updated for a while here's the reason: 
 	I haven't really been able to work on this project for a long time mostly due to school getting really intense and generally distance school starting (yet again).
+
+2021-03-22	version 00-0012
+	Made the socket connection non-blocking so that the program can now exit even while waiting for a message.
+
+	source file changes:
+		* src/connection.c (connectToBlack): now sets the socket to be nonblocking.
+		* src/connection.c: now can quit even when expecting a message from the client
+
+	header file changes
+		* include/vgcp.h: updated prototypes
+		* include/config.h: added new option for debugging the socket related code called _SOCKET_DEBUG
