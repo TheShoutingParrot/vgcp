@@ -1,12 +1,14 @@
 # Victor's Graphical Chess Program
 
-WARNING: This version's (00-0011) new features haven't been tested well and this version may have unexpected bugs.
+WARNING: This version's (00-0012) new features haven't been tested well and this version may have unexpected bugs.
 
 vgcp is a simple graphical chess UI which uses SDL2 and is written in C. 
 
 vgcp has been tested on Ubuntu, Void Linux, Arch Linux and MacOS.
 
 ## Usage 
+
+Using the actual program is very easy when installed. The game starts automatically. To move a piece you click on the piece click on the tile it should move to.
 
 If you wish to edit the software's (compilation) options then edit the definitions in [include/config.h](include/config.h).
 
