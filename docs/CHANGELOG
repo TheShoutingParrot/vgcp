@@ -216,10 +216,23 @@ NOTE: These entries may not contain every single minor change but should contain
 2021-03-22	version 00-0012
 	Made the socket connection non-blocking so that the program can now exit even while waiting for a message.
 
-	source file changes:
+	source file changes
 		* src/connection.c (connectToBlack): now sets the socket to be nonblocking.
 		* src/connection.c: now can quit even when expecting a message from the client
 
 	header file changes
 		* include/vgcp.h: updated prototypes
 		* include/config.h: added new option for debugging the socket related code called _SOCKET_DEBUG
+
+	EDIT 2021-03-24: very small stylistic change 
+
+2021-03-24	version 00-0013
+	Now implemented white moving via sockets and optimized some code.
+
+	source file changes
+		* src/connection.c: added new functions to handle the connection with the white connection.
+		* src/main.c (main): added a new command line argument in which the user can specify white's connection port ("-w")
+		* src/util.c (help): added more information about new command line arguments ("-b" and "-w")
+
+	header file changes
+		* include/vgcp.h: added new variables (msgToWhite, msgWhite), updated and added new prototypes

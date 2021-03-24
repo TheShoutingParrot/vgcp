@@ -35,17 +35,24 @@ uint8_t halfmoveClock = 0;
 struct position position;
 struct positionList positionList;
 
-struct server gameServer;
+struct server whiteServer;
+struct server blackServer;
 
-SDL_Thread *blackThreadID;
+SDL_Thread *blackThreadID,
+	   *whiteThreadID;
 
-SDL_sem *serverDataLock;
-SDL_sem *msgDataLock;
+SDL_sem *whiteServerDataLock,
+	*whiteMsgDataLock,
+	*blackServerDataLock,
+	*blackMsgDataLock;
 
+bool whiteOnPort = false;
 bool blackOnPort = false;
 
-struct msg msgBlack;
-struct msg msgServer;
+struct msg msgBlack,
+	   msgToBlack,
+	   msgWhite,
+	   msgToWhite;
 
 int main(int argc, char *args[]) {
 	uint8_t i;
@@ -64,13 +71,13 @@ int main(int argc, char *args[]) {
 						if((i+1) >= argc)
 							usage(args[0]);
 						
-						gameServer.port = atoi(args[++i]);
-						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "port %d will play as black\n", gameServer.port);
+						blackServer.port = atoi(args[++i]);
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "port %d will play as black\n", blackServer.port);
 						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "This feature (other programs controlling a player) hasn't been tested well at all, please don't use this if you aren't debugging!");
 
 						/* if the connection failed then die */
 						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting for black to connect");
-						if(!connectToBlack())
+						if(!connectToClient(&blackServer, colorBlack))
 							die("Connection between the GUI and the player failed");
 
 						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "black connected succesfully");
@@ -78,6 +85,26 @@ int main(int argc, char *args[]) {
 						createBlackThread();
 						
 						break;
+
+					case 'w':
+						if((i+1) >= argc)
+							usage(args[0]);
+						
+						whiteServer.port = atoi(args[++i]);
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "port %d will play as white\n", blackServer.port);
+						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "This feature (other programs controlling a player) hasn't been tested well at all, please don't use this if you aren't debugging!");
+
+						/* if the connection failed then die */
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting for white to connect");
+						if(!connectToClient(&whiteServer, colorWhite))
+							die("Connection between the GUI and the player failed");
+
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "black connected succesfully");
+
+						createWhiteThread();
+
+						break;
+
 					default:
 						usage(args[0]);
 				}
@@ -87,6 +114,7 @@ int main(int argc, char *args[]) {
 				usage(args[0]);
 			}
 		}
+
 		else {
 			usage(args[0]);
 		}
@@ -106,7 +134,9 @@ int main(int argc, char *args[]) {
 	SDL_Event event;
 
 	msgBlack.empty = true;
-	msgServer.empty = true;
+	msgToBlack.empty = true;
+	msgWhite.empty = true;
+	msgToWhite.empty = true;
 
 mainGameLoop:
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "game begins");
@@ -144,41 +174,78 @@ mainGameLoop:
 							free(event.user.data2);
 
 							if(blackOnPort) {
-								SDL_SemWait(msgDataLock);
+								SDL_SemWait(blackMsgDataLock);
+
 								if(position.playerToMove == colorBlack) {
-									msgServer.empty = false;
-									msgServer.type = MSG_MOVE_AND_END;
-									msgServer.data.lastMove.move = position.prevMove;
-									msgServer.data.lastMove.winner = gameWinner;
+									msgToBlack.empty = false;
+									msgToBlack.type = MSG_MOVE_AND_END;
+									msgToBlack.data.lastMove.move = position.prevMove;
+									msgToBlack.data.lastMove.winner = gameWinner;
 								}
 								else {
-									msgServer.empty = false;
-									msgServer.type = MSG_GAME_ENDS;
-									msgServer.data.winner = gameWinner;
+									msgToBlack.empty = false;
+									msgToBlack.type = MSG_GAME_ENDS;
+									msgToBlack.data.winner = gameWinner;
 								}
-								SDL_SemPost(msgDataLock);
+
+								SDL_SemPost(blackMsgDataLock);
+							}
+
+							if(whiteOnPort) {
+								SDL_SemWait(whiteMsgDataLock);
+
+								if(position.playerToMove == colorWhite) {
+									msgToWhite.empty = false;
+									msgToWhite.type = MSG_MOVE_AND_END;
+									msgToWhite.data.lastMove.move = position.prevMove;
+									msgToWhite.data.lastMove.winner = gameWinner;
+								}
+								else {
+									msgToWhite.empty = false;
+									msgToWhite.type = MSG_GAME_ENDS;
+									msgToWhite.data.winner = gameWinner;
+								}
+
+								SDL_SemPost(whiteMsgDataLock);
 							}
 
 							goto gameOverLoop;
 
 						case MOVED_EVENT:
-							if(blackOnPort) {
-								SDL_SemWait(msgDataLock);
+							if(whiteOnPort) {
+								SDL_SemWait(whiteMsgDataLock);
 
-								msgServer.empty = false;
+								msgToWhite.empty = false;
+								msgToWhite.to = colorWhite;
 
-								if(*((color_t *)event.user.data1) == colorWhite) {
-									msgServer.to = colorBlack;
-									msgServer.type = MSG_MOVE;
-									msgServer.data.move = position.prevMove;
+								if(*((color_t *)event.user.data1) == colorBlack) {
+									msgToWhite.type = MSG_MOVE;
+									msgToWhite.data.move = position.prevMove;
 								}
 
 								else {
-									msgServer.to = colorBlack;
-									msgServer.type = MSG_ROGER; /* we want to tell the client that we recieved this move and it worked */
+									msgToWhite.type = MSG_ROGER; /* we want to tell the client that we recieved this move and it worked */
 								}
 
-								SDL_SemPost(msgDataLock);
+								SDL_SemPost(whiteMsgDataLock);
+							}
+
+							if(blackOnPort) {
+								SDL_SemWait(blackMsgDataLock);
+
+								msgToBlack.empty = false;
+								msgToBlack.to = colorBlack;
+
+								if(*((color_t *)event.user.data1) == colorWhite) {
+									msgToBlack.type = MSG_MOVE;
+									msgToBlack.data.move = position.prevMove;
+								}
+
+								else {
+									msgToBlack.type = MSG_ROGER; /* we want to tell the client that we recieved this move and it worked */
+								}
+
+								SDL_SemPost(blackMsgDataLock);
 							}
 							break;
 
@@ -208,6 +275,23 @@ mainGameLoop:
 			}
 
 			msgBlack.empty = true; /* now that we handled this we can label the black message as trash */
+		}
+
+		if(whiteOnPort && !msgWhite.empty && msgWhite.to == noColor) {
+			printf("hwite type %d %d\n", msgBlack.type, MSG_MOVE);
+
+			switch(msgWhite.type) {
+				case MSG_MOVE:
+					printf("%d, %d -> %d, %d\n", msgWhite.data.move.from.x, msgWhite.data.move.from.y,
+							msgWhite.data.move.to.x, msgWhite.data.move.to.y);
+					movePiece(msgWhite.data.move);
+					break;
+				default:
+					SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown type of message sent to the main thread!");
+					break;
+			}
+
+			msgWhite.empty = true; /* now that we handled this we can label the black message as trash */
 		}
 
 		SDL_Delay(50);
@@ -272,15 +356,23 @@ gameOverLoop:
 						initPosition();
 
 						if(blackOnPort) {
-							SDL_SemWait(serverDataLock);
+							SDL_SemWait(blackServerDataLock);
 
-							msgServer.empty = false;
-							msgServer.type = MSG_NEW_GAME;
-							msgServer.data.playerColor = colorBlack;
+							msgToBlack.empty = false;
+							msgToBlack.type = MSG_NEW_GAME;
+							msgToBlack.data.playerColor = colorBlack;
 
-							puts("Hello there! Thiz goo!");
+							SDL_SemPost(blackServerDataLock);
+						}
 
-							SDL_SemPost(serverDataLock);
+						if(whiteOnPort) {
+							SDL_SemWait(whiteServerDataLock);
+
+							msgToWhite.empty = false;
+							msgToWhite.type = MSG_NEW_GAME;
+							msgToWhite.data.playerColor = colorBlack;
+
+							SDL_SemPost(whiteServerDataLock);
 						}
 
 						goto mainGameLoop;
@@ -297,17 +389,31 @@ quitGame:
 	cleanup();
 
 	if(blackOnPort) {
-		SDL_SemWait(msgDataLock);
+		SDL_SemWait(blackMsgDataLock);
 
-		msgServer.empty = false;
-		msgServer.type = MSG_QUITTING;
+		msgToBlack.empty = false;
+		msgToBlack.type = MSG_QUITTING;
 
-		SDL_SemPost(msgDataLock);
+		SDL_SemPost(blackMsgDataLock);
 
-		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting for the thread to finish...");
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting for the black thread to finish...");
 		SDL_Delay(100);
 
 		SDL_WaitThread(blackThreadID, NULL);
+	}
+
+	if(whiteOnPort) {
+		SDL_SemWait(whiteMsgDataLock);
+
+		msgToWhite.empty = false;
+		msgToWhite.type = MSG_QUITTING;
+
+		SDL_SemPost(whiteMsgDataLock);
+
+		SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "waiting for the white thread to finish...");
+		SDL_Delay(100);
+
+		SDL_WaitThread(whiteThreadID, NULL);
 	}
 
 	return EXIT_SUCCESS;
@@ -330,7 +436,8 @@ void handleMousebuttonEvent(SDL_MouseButtonEvent event) {
 	if(position.board[y][x].piece != empty
 			&& selectedPiece.x == -1
 			&& position.board[y][x].color == position.playerToMove) {
-		if(position.playerToMove == colorBlack	&& blackOnPort == true);
+		if(position.playerToMove == colorBlack && blackOnPort);
+		else if(position.playerToMove == colorWhite && whiteOnPort);
 		else
 			selectPiece(y, x);
 	}

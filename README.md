@@ -1,7 +1,5 @@
 # Victor's Graphical Chess Program
 
-WARNING: This version's (00-0012) new features haven't been tested well and this version may have unexpected bugs.
-
 vgcp is a simple graphical chess UI which uses SDL2 and is written in C. 
 
 vgcp has been tested on Ubuntu, Void Linux, Arch Linux and MacOS.

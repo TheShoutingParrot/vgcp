@@ -36,7 +36,7 @@
 /* definitions */
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0012"
+#define PROGRAM_VERSION         "00-0013"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -250,17 +250,24 @@ extern uint8_t			halfmoveClock;
 extern struct position		position;
 extern struct positionList	positionList;
 
-extern struct server		gameServer;
+extern struct server		whiteServer;
+extern struct server		blackServer;
 
-extern SDL_Thread 		*blackThreadID;
+extern SDL_Thread 		*whiteThreadID,
+				*blackThreadID;
 
-extern SDL_sem			*serverDataLock;
-extern SDL_sem			*msgDataLock;
+extern SDL_sem			*whiteServerDataLock,
+       				*blackServerDataLock,
+				*whiteMsgDataLock,
+				*blackMsgDataLock;
 
-extern bool			blackOnPort;
+extern bool			whiteOnPort,
+      				blackOnPort;
 
-extern struct msg		msgBlack;
-extern struct msg		msgServer;
+extern struct msg		msgBlack,
+				msgToBlack,
+				msgWhite,
+				msgToWhite;
 
 /* function prototypes (files can be all found in the "src/" directory) */
 
@@ -322,10 +329,11 @@ void help(const char *name);
 void die(char *fmt, ...);
 
 /* connection.c */
-bool connectToBlack(void);
+bool connectToClient(struct server *gameServer, color_t color);
 struct move convertPlayerMsgToMove(const char *msg);
 void closeSocket(int socket);
 int connectionHandlingThread(void *data);
 void createBlackThread(void);
+void createWhiteThread(void);
 
 #endif /* #ifndef __VGCP_H */
