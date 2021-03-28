@@ -215,7 +215,6 @@ struct msg convertStringToMsg(char *str) {
 	switch(*str) {
 		case 'm':
 			msg.empty = false;
-			msg.to = noColor;
 			msg.type = MSG_MOVE;
 
 			msg.data.move = convertPlayerMsgToMove(str);
@@ -224,7 +223,6 @@ struct msg convertStringToMsg(char *str) {
 
 		case 'q':
 			msg.empty = false;
-			msg.to = noColor;
 			msg.type = MSG_QUITTING; /* this tells the receiver that whoever sent this is quitting 
 						  * (this can be interpreted as a resignation... because it kind of is) */
 
@@ -388,7 +386,7 @@ static void whiteWaitForRoger(uint8_t stateIfRoger) {
 #ifdef _SOCKET_DEBUG
 				puts("would block");
 #else
-				continue;
+				SDL_Delay(10);
 #endif
 			else
 				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "reading socket failed");
@@ -418,7 +416,7 @@ static void whiteWaitForRoger(uint8_t stateIfRoger) {
 		SDL_SemPost(whiteMsgDataLock);
 		SDL_SemPost(whiteServerDataLock);
 
-		SDL_Delay(50);
+		SDL_Delay(25); /* in this time the main thread could send this thread a message */
 
 		SDL_SemWait(whiteMsgDataLock);
 		SDL_SemWait(whiteServerDataLock);
@@ -437,7 +435,6 @@ static void whiteWaitForRoger(uint8_t stateIfRoger) {
 
 			whiteQuits();
 		}
-
 	}
 
 end_wait_for_roger_white:
@@ -460,7 +457,7 @@ static void blackWaitForRoger(uint8_t stateIfRoger) {
 #ifdef _SOCKET_DEBUG
 				puts("would block");
 #else
-				continue;
+				SDL_Delay(10);
 #endif
 			else
 				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "reading socket failed");
@@ -490,7 +487,7 @@ static void blackWaitForRoger(uint8_t stateIfRoger) {
 		SDL_SemPost(blackMsgDataLock);
 		SDL_SemPost(blackServerDataLock);
 
-		SDL_Delay(50);
+		SDL_Delay(25);
 
 		SDL_SemWait(blackMsgDataLock);
 		SDL_SemWait(blackServerDataLock);
@@ -537,13 +534,14 @@ int whiteConnectionHandlingThread(void *data) {
 #ifdef _SOCKET_DEBUG
 						puts("would block (fyi waiting fo white)");
 #else
-						continue;
+						SDL_Delay(10);
 #endif /* #ifdef _SOCKET_DEBUG */
 					else
 						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "reading socket failed");
 
 					break;
 				}
+
 
 				msgWhite = convertStringToMsg(whiteServer.in);
 
@@ -582,7 +580,7 @@ int whiteConnectionHandlingThread(void *data) {
 				break;
 
 			case waitingForBlack:
-				if(msgToWhite.to == colorWhite && msgToWhite.empty == false && msgToWhite.type != MSG_QUITTING) {
+				if(msgToWhite.empty == false && msgToWhite.type != MSG_QUITTING) {
 					strcpy(whiteServer.out, convertMsgToString(msgToWhite));
 
 					msgToWhite.empty = true;
@@ -594,7 +592,10 @@ int whiteConnectionHandlingThread(void *data) {
 				break;
 
 			case standby: /* this waits for the next game to start */
+#ifdef _SOCKET_DEBUG
 				SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "the connection thread is on standby!");
+#endif
+
 				if(!msgToWhite.empty && msgToWhite.type != MSG_QUITTING) {
 					msgToWhite.empty = true;
 
@@ -612,7 +613,7 @@ int whiteConnectionHandlingThread(void *data) {
 				break;
 		}
 
-		if(!msgToBlack.empty && msgToBlack.type == MSG_QUITTING) {
+		if(!msgToWhite.empty && msgToWhite.type == MSG_QUITTING) {
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "quitting command received from main thread!");
 
 			strcpy(whiteServer.out, convertMsgToString(msgToWhite));
@@ -634,7 +635,6 @@ int whiteConnectionHandlingThread(void *data) {
 		SDL_Delay(500);
 	}
 
-
 	whiteQuits();
 }
 
@@ -651,7 +651,7 @@ int blackConnectionHandlingThread(void *data) {
 
 		switch(blackServer.state) {
 			case waitingForWhite:
-				if(msgToBlack.to == colorBlack && msgToBlack.empty == false && msgToBlack.type != MSG_QUITTING) {
+				if(msgToBlack.empty == false && msgToBlack.type != MSG_QUITTING) {
 					strcpy(blackServer.out, convertMsgToString(msgToBlack));
 
 					msgToBlack.empty = true;
@@ -673,7 +673,7 @@ int blackConnectionHandlingThread(void *data) {
 #ifdef _SOCKET_DEBUG
 						puts("would block (fyi waiting fo black)");
 #else
-						continue;
+						SDL_Delay(10);
 #endif /* #ifdef _SOCKET_DEBUG */
 					else
 						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "reading socket failed");
@@ -718,7 +718,10 @@ int blackConnectionHandlingThread(void *data) {
 				break;
 
 			case standby: /* this waits for the next game to start */
+#ifdef _SOCKET_DEBUG
 				SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "the connection thread is on standby!");
+#endif
+
 				if(!msgToBlack.empty && msgToBlack.type != MSG_QUITTING) {
 					strcpy(blackServer.out, convertMsgToString(msgToBlack));
 msgToBlack.empty = true;

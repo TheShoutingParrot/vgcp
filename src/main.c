@@ -82,8 +82,8 @@ int main(int argc, char *args[]) {
 
 						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "black connected succesfully");
 
-						createBlackThread();
-						
+						blackOnPort = true;
+
 						break;
 
 					case 'w':
@@ -101,7 +101,7 @@ int main(int argc, char *args[]) {
 
 						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "black connected succesfully");
 
-						createWhiteThread();
+						whiteOnPort = true;
 
 						break;
 
@@ -120,6 +120,17 @@ int main(int argc, char *args[]) {
 		}
 	}
 
+	msgBlack.empty = true;
+	msgToBlack.empty = true;
+	msgWhite.empty = true;
+	msgToWhite.empty = true;
+	
+	if(whiteOnPort)
+		createWhiteThread();
+
+	if(blackOnPort)
+		createBlackThread();
+
 #ifdef _DEBUG
 	SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "debug option is on! You've been warned!");
 #endif
@@ -132,11 +143,6 @@ int main(int argc, char *args[]) {
 	initPosition();
 
 	SDL_Event event;
-
-	msgBlack.empty = true;
-	msgToBlack.empty = true;
-	msgWhite.empty = true;
-	msgToWhite.empty = true;
 
 mainGameLoop:
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "game begins");
@@ -216,7 +222,6 @@ mainGameLoop:
 								SDL_SemWait(whiteMsgDataLock);
 
 								msgToWhite.empty = false;
-								msgToWhite.to = colorWhite;
 
 								if(*((color_t *)event.user.data1) == colorBlack) {
 									msgToWhite.type = MSG_MOVE;
@@ -234,7 +239,6 @@ mainGameLoop:
 								SDL_SemWait(blackMsgDataLock);
 
 								msgToBlack.empty = false;
-								msgToBlack.to = colorBlack;
 
 								if(*((color_t *)event.user.data1) == colorWhite) {
 									msgToBlack.type = MSG_MOVE;
@@ -260,13 +264,9 @@ mainGameLoop:
 			}
 		}
 
-		if(blackOnPort && !msgBlack.empty && msgBlack.to == noColor) {
-			printf("type %d %d\n", msgBlack.type, MSG_MOVE);
-
+		if(blackOnPort && !msgBlack.empty) {
 			switch(msgBlack.type) {
 				case MSG_MOVE:
-					printf("%d, %d -> %d, %d\n", msgBlack.data.move.from.x, msgBlack.data.move.from.y,
-							msgBlack.data.move.to.x, msgBlack.data.move.to.y);
 					movePiece(msgBlack.data.move);
 					break;
 				default:
@@ -277,13 +277,9 @@ mainGameLoop:
 			msgBlack.empty = true; /* now that we handled this we can label the black message as trash */
 		}
 
-		if(whiteOnPort && !msgWhite.empty && msgWhite.to == noColor) {
-			printf("hwite type %d %d\n", msgBlack.type, MSG_MOVE);
-
+		if(whiteOnPort && !msgWhite.empty) {
 			switch(msgWhite.type) {
 				case MSG_MOVE:
-					printf("%d, %d -> %d, %d\n", msgWhite.data.move.from.x, msgWhite.data.move.from.y,
-							msgWhite.data.move.to.x, msgWhite.data.move.to.y);
 					movePiece(msgWhite.data.move);
 					break;
 				default:
@@ -370,7 +366,7 @@ gameOverLoop:
 
 							msgToWhite.empty = false;
 							msgToWhite.type = MSG_NEW_GAME;
-							msgToWhite.data.playerColor = colorBlack;
+							msgToWhite.data.playerColor = colorWhite;
 
 							SDL_SemPost(whiteServerDataLock);
 						}
@@ -386,8 +382,6 @@ gameOverLoop:
 	}
 
 quitGame:
-	cleanup();
-
 	if(blackOnPort) {
 		SDL_SemWait(blackMsgDataLock);
 
@@ -415,6 +409,8 @@ quitGame:
 
 		SDL_WaitThread(whiteThreadID, NULL);
 	}
+
+	cleanup();
 
 	return EXIT_SUCCESS;
 }

@@ -36,7 +36,7 @@
 /* definitions */
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0013"
+#define PROGRAM_VERSION         "00-0014"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -216,8 +216,6 @@ union msgDataTypes {
 
 struct msg {
 	bool 			empty;
-	color_t			to;		/* this tells us who the message is to (which color player or if it's to the 
-						 * server. noColor = to the server or (if from server) to all */
 	msgType_t		type;
 	union msgDataTypes 	data;
 };
