@@ -12,6 +12,6 @@
 
 //#define _INSTALL
 //#define _DEBUG
-#define _SOCKET_DEBUG
+//#define _SOCKET_DEBUG
 
 #endif

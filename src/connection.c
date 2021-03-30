@@ -301,7 +301,7 @@ static void whiteWaitForReceivingMsg(void) {
 		SDL_SemPost(whiteMsgDataLock);
 		SDL_SemPost(whiteServerDataLock);
 
-		SDL_Delay(100);
+		SDL_Delay(25);
 	}
 }
 
@@ -366,7 +366,7 @@ static void blackWaitForReceivingMsg(void) {
 		SDL_SemPost(blackMsgDataLock);
 		SDL_SemPost(blackServerDataLock);
 
-		SDL_Delay(100);
+		SDL_Delay(25);
 	}
 }
 
@@ -556,8 +556,7 @@ int whiteConnectionHandlingThread(void *data) {
 				SDL_SemPost(whiteServerDataLock);
 
 				/* the main thread needs to check that the move was legal and did the move result in the game ending
-				 * (draw or checkmate) 
-				 * REMEMBER: The main thread currently doesn't check if the move is legal! */
+				 * (draw or checkmate) */
 				whiteWaitForReceivingMsg();
 
 				SDL_SemWait(whiteMsgDataLock);
@@ -572,7 +571,7 @@ int whiteConnectionHandlingThread(void *data) {
 					whiteServer.state = waitingForBlack;
 				}
 
-				SDL_Delay(100);
+				SDL_Delay(10);
 		
 				SDL_SemPost(whiteMsgDataLock);
 				SDL_SemPost(whiteServerDataLock);
@@ -632,7 +631,7 @@ int whiteConnectionHandlingThread(void *data) {
 
 		SDL_SemPost(whiteServerDataLock);
 
-		SDL_Delay(500);
+		SDL_Delay(50);
 	}
 
 	whiteQuits();
@@ -710,7 +709,7 @@ int blackConnectionHandlingThread(void *data) {
 					blackServer.state = waitingForWhite;
 				}
 
-				SDL_Delay(100);
+				SDL_Delay(25);
 		
 				SDL_SemPost(blackMsgDataLock);
 				SDL_SemPost(blackServerDataLock);
@@ -757,7 +756,7 @@ msgToBlack.empty = true;
 
 		SDL_SemPost(blackServerDataLock);
 
-		SDL_Delay(500);
+		SDL_Delay(50);
 	}
 
 	blackQuits();

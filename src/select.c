@@ -29,6 +29,8 @@ void selectPiece(uint8_t y, uint8_t x) {
                         break;
 
                 case queen:
+			/* the queen is basically a bishop + a rook so we don't need a seperate function
+			 * for mapping that */
                         mapBishopPotentialMoves(x, y, potentialMove);
                         mapRookPotentialMoves(x, y, potentialMove);
 

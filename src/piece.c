@@ -44,6 +44,8 @@ void mapPawnPotentialMoves(uint8_t x, uint8_t y) {
 
 }
 
+/* the state variable is for what state are we setting the potential moves as,
+ * either they are underThreatByX or set as a potentialMove */
 void mapKnightPotentialMoves(uint8_t x, uint8_t y, uint8_t state) {
         SDL_Point potential;
 

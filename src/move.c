@@ -440,3 +440,63 @@ void pushMoveEvent(color_t color) {
 
 	SDL_PushEvent(&moveEvent);
 }
+
+/* this function is used especially when another program is controlling a player
+ * (through a port) and then we have to make sure that the move was legal 
+ * REMEMBER: This should be called BEFORE making the actual move! */
+bool checkMoveLegality(struct move move, color_t color) {
+	/* check if the move is moving the right color */
+	if(color != move.color || position.board[move.from.y][move.from.x].color != color) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "not the same color");
+		return false;
+	}
+
+	switch(position.board[move.from.y][move.from.x].piece) {
+		case pawn:
+			mapPawnPotentialMoves(move.from.x, move.from.y);
+
+			break;
+
+		case knight:
+			mapKnightPotentialMoves(move.from.x, move.from.y, potentialMove);
+
+			break;
+
+		case bishop:
+			mapBishopPotentialMoves(move.from.x, move.from.y, potentialMove);
+
+			break;
+
+		case rook:
+			mapRookPotentialMoves(move.from.x, move.from.y, potentialMove);
+
+			break;		
+
+		case queen:
+			mapBishopPotentialMoves(move.from.x, move.from.y, potentialMove);
+			mapRookPotentialMoves(move.from.x, move.from.y, potentialMove);
+
+			break;
+
+		case king:
+			mapKingPotentialMoves(move.from.x, move.from.y, potentialMove, true);
+
+			break;
+
+		case empty:
+		default:
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "client trying to move piece from tile that is empty");
+			return false;
+	}
+
+	if(position.board[move.to.y][move.to.x].tileState & potentialMove);
+	else {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "the client attempted to make an illegal move!");
+		return false;
+	}
+
+	deselectPiece();
+
+
+	return true;
+}

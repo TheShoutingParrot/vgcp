@@ -248,3 +248,15 @@ NOTE: These entries may not contain every single minor change but should contain
 
 	header file changes
 		* include/vgcp.h: removed "to" variable from the "msg" structure
+
+2021-03-30	version 00-0015
+	Now checks the client's move's legality, shortened the delays between checking if new messages have come from the client or the main thread and made minor changes to some log messages.
+
+	source file changes
+		* src/connection.c: lessened some delays between checking for messages
+		* src/move.c: added new function called checkMoveLegality
+		* src/main.c (main): now calls the checkMoveLegality before executing the client's move
+	
+	header file changes
+		* include/vgcp.h: updated prototypes
+		* include/config.h: the _SOCKET_DEBUG option is no longer default

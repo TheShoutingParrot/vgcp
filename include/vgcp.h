@@ -36,7 +36,7 @@
 /* definitions */
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0014"
+#define PROGRAM_VERSION         "00-0015"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -298,6 +298,7 @@ void checkIfMated(color_t color, bool fromMove);
 void updateBoard(void);
 void updateHalfmoveClock(struct move move);
 void pushMoveEvent(color_t color);
+bool checkMoveLegality(struct move move, color_t color);
 
 /* select.c */
 void selectPiece(uint8_t y, uint8_t x);

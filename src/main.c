@@ -91,7 +91,7 @@ int main(int argc, char *args[]) {
 							usage(args[0]);
 						
 						whiteServer.port = atoi(args[++i]);
-						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "port %d will play as white\n", blackServer.port);
+						SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "port %d will play as white\n", whiteServer.port);
 						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "This feature (other programs controlling a player) hasn't been tested well at all, please don't use this if you aren't debugging!");
 
 						/* if the connection failed then die */
@@ -267,7 +267,14 @@ mainGameLoop:
 		if(blackOnPort && !msgBlack.empty) {
 			switch(msgBlack.type) {
 				case MSG_MOVE:
-					movePiece(msgBlack.data.move);
+					if(checkMoveLegality(msgBlack.data.move, colorBlack))
+						movePiece(msgBlack.data.move);
+					else {
+						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "the move made by the client (black) was illegal!... quitting connection");
+
+						msgToBlack.empty = false;
+						msgToBlack.type = MSG_QUITTING; /* we want to tell the client that we recieved this move and it worked */
+					}
 					break;
 				default:
 					SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown type of message sent to the main thread!");
@@ -280,7 +287,14 @@ mainGameLoop:
 		if(whiteOnPort && !msgWhite.empty) {
 			switch(msgWhite.type) {
 				case MSG_MOVE:
-					movePiece(msgWhite.data.move);
+					if(checkMoveLegality(msgWhite.data.move, colorWhite))
+						movePiece(msgWhite.data.move);
+					else {
+						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "the move made by the client (white) was illegal!... quitting connection");
+
+						msgToWhite.empty = false;
+						msgToWhite.type = MSG_QUITTING; /* we want to tell the client that we recieved this move and it worked */
+					}
 					break;
 				default:
 					SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unknown type of message sent to the main thread!");
