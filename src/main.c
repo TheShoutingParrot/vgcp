@@ -273,7 +273,7 @@ mainGameLoop:
 						SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "the move made by the client (black) was illegal!... quitting connection");
 
 						msgToBlack.empty = false;
-						msgToBlack.type = MSG_QUITTING; /* we want to tell the client that we recieved this move and it worked */
+						msgToBlack.type = MSG_QUITTING; /* we want to tell the client that we received this move and it worked */
 					}
 					break;
 				default:

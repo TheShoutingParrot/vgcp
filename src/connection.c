@@ -114,6 +114,15 @@ static void blackQuits(void) {
 	SDL_SemPost(blackServerDataLock);
 	SDL_SemPost(blackMsgDataLock);
 
+	msgToBlack.empty = false;
+	msgToBlack.type = MSG_QUITTING;
+
+	strcpy(blackServer.out, convertMsgToString(msgToBlack));
+	send(blackServer.socket, blackServer.out, strlen(blackServer.out), 30);
+
+	SDL_SemPost(blackServerDataLock);
+	SDL_SemPost(blackMsgDataLock);
+
 	blackOnPort = false; /* this may be unsafe? */
 
 	SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "black connection handling thread quits!");
@@ -122,6 +131,15 @@ static void blackQuits(void) {
 }
 
 static void whiteQuits(void) {
+	SDL_SemWait(whiteServerDataLock);
+	SDL_SemWait(whiteMsgDataLock);
+
+	msgToWhite.empty = false;
+	msgToWhite.type = MSG_QUITTING;
+
+	strcpy(whiteServer.out, convertMsgToString(msgToWhite));
+	send(whiteServer.socket, whiteServer.out, strlen(whiteServer.out), 30);
+
 	SDL_SemPost(whiteServerDataLock);
 	SDL_SemPost(whiteMsgDataLock);
 
@@ -284,9 +302,6 @@ static void whiteWaitForReceivingMsg(void) {
 				case MSG_QUITTING:
 					SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unexpected quit message, quitting...");
 
-					strcpy(whiteServer.out, convertMsgToString(msgToBlack));
-					send(whiteServer.socket, whiteServer.out, strlen(whiteServer.out), 30);
-
 					SDL_SemPost(whiteMsgDataLock);
 					SDL_SemPost(whiteServerDataLock);
 
@@ -348,9 +363,6 @@ static void blackWaitForReceivingMsg(void) {
 
 				case MSG_QUITTING:
 					SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "unexpected quit message, quitting...");
-
-					strcpy(blackServer.out, convertMsgToString(msgToBlack));
-					send(blackServer.socket, blackServer.out, strlen(blackServer.out), 30);
 
 					SDL_SemPost(blackMsgDataLock);
 					SDL_SemPost(blackServerDataLock);
@@ -424,12 +436,6 @@ static void whiteWaitForRoger(uint8_t stateIfRoger) {
 		if(!msgToWhite.empty && msgToWhite.type == MSG_QUITTING) {
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "quitting command received from main thread!");
 
-			strcpy(whiteServer.out, convertMsgToString(msgToWhite));
-
-			send(whiteServer.socket, whiteServer.out, strlen(whiteServer.out), 30);
-
-			msgToWhite.empty = true;
-
 			SDL_SemPost(whiteMsgDataLock);
 			SDL_SemPost(whiteServerDataLock);
 
@@ -494,12 +500,6 @@ static void blackWaitForRoger(uint8_t stateIfRoger) {
 
 		if(!msgToBlack.empty && msgToBlack.type == MSG_QUITTING) {
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "quitting command received from main thread!");
-
-			strcpy(blackServer.out, convertMsgToString(msgToBlack));
-
-			send(blackServer.socket, blackServer.out, strlen(blackServer.out), 30);
-
-			msgToBlack.empty = true;
 
 			SDL_SemPost(blackMsgDataLock);
 			SDL_SemPost(blackServerDataLock);
@@ -614,11 +614,6 @@ int whiteConnectionHandlingThread(void *data) {
 
 		if(!msgToWhite.empty && msgToWhite.type == MSG_QUITTING) {
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "quitting command received from main thread!");
-
-			strcpy(whiteServer.out, convertMsgToString(msgToWhite));
-			send(whiteServer.socket, whiteServer.out, strlen(whiteServer.out), 30);
-
-			msgToWhite.empty = true;
 
 #ifdef _SOCKET_DEBUG 
 			printf("sending quit command to client: %s and len %d\n", whiteServer.out, strlen(whiteServer.out));
@@ -739,11 +734,6 @@ msgToBlack.empty = true;
 
 		if(!msgToBlack.empty && msgToBlack.type == MSG_QUITTING) {
 			SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "quitting command received from main thread!");
-
-			strcpy(blackServer.out, convertMsgToString(msgToBlack));
-			send(blackServer.socket, blackServer.out, strlen(blackServer.out), 30);
-
-			msgToBlack.empty = true;
 
 #ifdef _SOCKET_DEBUG 
 			printf("sending quit command to client: %s and len %d\n", blackServer.out, strlen(blackServer.out));

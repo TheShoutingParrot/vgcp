@@ -36,7 +36,7 @@
 /* definitions */
 
 /* vgcp's version (MAJOR-MINOR) */
-#define PROGRAM_VERSION         "00-0015"
+#define PROGRAM_VERSION         "00-0016"
 
 #define GAME_NAME               "vgcp"
 #define GAME_LOGICAL_WIDTH      800
@@ -330,6 +330,7 @@ void die(char *fmt, ...);
 /* connection.c */
 bool connectToClient(struct server *gameServer, color_t color);
 struct move convertPlayerMsgToMove(const char *msg);
+char *convertMsgToString(struct msg msg);
 void closeSocket(int socket);
 int connectionHandlingThread(void *data);
 void createBlackThread(void);
